@@ -1,0 +1,9 @@
+
+{
+  "name": "ZENTUM - Advanced Trading Platform",
+  "description": "A high-end, dual-mode trading platform for Forex and Cryptocurrency, featuring real-time charts, advanced analytics, and AI-powered market insights.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
