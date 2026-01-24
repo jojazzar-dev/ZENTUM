@@ -14,22 +14,12 @@ export interface MarketData {
 export interface User {
   id: string;
   email: string;
-  password?: string;   // أضفنا حقل كلمة المرور
   name: string;
-  dob?: string;         // جعلناه اختيارياً (علامة ?) لعدم تعليق الكود
-  nationality?: string; // اختياري
-  phone?: string;       // اختياري
+  password?: string;
+  dob?: string;
+  nationality?: string;
+  phone?: string;
   forexBalance: number;
   cryptoBalance: number;
   role: 'USER' | 'ADMIN';
-}
-
-export interface Trade {
-  id: string;
-  symbol: string;
-  type: 'BUY' | 'SELL';
-  amount: number;
-  price: number;
-  timestamp: number;
-  marketType: MarketType;
 }
