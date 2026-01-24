@@ -14,12 +14,19 @@ export interface MarketData {
 export interface User {
   id: string;
   email: string;
-  name: string;
   password?: string;
-  dob?: string;
-  nationality?: string;
-  phone?: string;
+  name: string;
   forexBalance: number;
   cryptoBalance: number;
   role: 'USER' | 'ADMIN';
+}
+
+export interface DepositRequest {
+  id: string;
+  userId: string;
+  userEmail: string;
+  amount: number;
+  coin: string;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  timestamp: number;
 }

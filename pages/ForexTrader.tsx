@@ -2,15 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Logo } from '../constants';
 import { fetchFXPrices } from '../services/marketService';
-import DepositModal from '../components/DepositModal'; // استيراد المكون الجديد
+import DepositModal from '../components/DepositModal';
 
 const ForexTrader: React.FC<{ user: any, onUpdateBalance: any, onLogout: any }> = ({ user, onUpdateBalance, onLogout }) => {
   const navigate = useNavigate();
   const [selected, setSelected] = useState('EURUSD');
   const [volume, setVolume] = useState(0.10);
   const [fxRates, setFxRates] = useState<any>({});
-  
-  // حالة التحكم في فتح وإغلاق نافذة الإيداع
   const [isDepositOpen, setIsDepositOpen] = useState(false);
   
   const [orders, setOrders] = useState<any[]>(() => {
@@ -46,7 +44,7 @@ const ForexTrader: React.FC<{ user: any, onUpdateBalance: any, onLogout: any }> 
 
   const totalPL = orders.reduce((sum, o) => sum + calculatePL(o), 0);
   const equity = user.forexBalance + totalPL;
-  const margin = orders.reduce((sum, o) => sum + (o.volume * 200), 0);
+  const margin = orders.length * 200;
   const freeMargin = equity - margin;
 
   useEffect(() => {
@@ -83,98 +81,99 @@ const ForexTrader: React.FC<{ user: any, onUpdateBalance: any, onLogout: any }> 
 
   return (
     <div className="h-screen flex flex-col bg-[#0b0e11] text-[#d1d4dc] text-[11px] overflow-hidden font-sans select-none">
-      <nav className="h-12 border-b border-[#2b2f36] bg-[#181a20] flex items-center justify-between px-4">
+      {/* Navbar - Responsive */}
+      <nav className="h-14 border-b border-[#2b2f36] bg-[#181a20] flex items-center justify-between px-3 z-[100]">
         <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
-          <Logo className="w-6 h-6" />
-          <span className="font-bold text-white uppercase text-xs">ZENTUM TERMINAL</span>
+          <Logo className="w-7 h-7" />
+          <span className="font-bold text-white uppercase text-[10px] sm:text-xs">ZENTUM TERMINAL</span>
         </div>
         <div className="flex gap-2 items-center">
-           <div className="bg-black/40 px-3 py-1 rounded border border-white/5 font-bold uppercase text-[9px] mr-2">
-              Balance: <span className="text-white">${user.forexBalance.toFixed(2)}</span>
+           <div className="bg-black/40 px-2 py-1 rounded border border-white/5 font-bold uppercase text-[9px]">
+              <span className="hidden xs:inline text-gray-500 mr-1">Bal:</span>
+              <span className="text-white">${user.forexBalance.toFixed(2)}</span>
            </div>
-           
-           <div className="flex gap-1.5">
-             {/* تم ربط الزر بفتح نافذة الإيداع */}
-             <button 
-                onClick={() => setIsDepositOpen(true)} 
-                className="bg-blue-600 text-white px-3 py-1 rounded text-[8px] font-black uppercase hover:bg-blue-500 transition-all shadow-md"
-             >
-                Add Funds
-             </button>
-             
-             <button onClick={() => alert("Withdrawal request submitted for review.")} className="border border-white/20 text-white px-3 py-1 rounded text-[8px] font-black uppercase hover:bg-white/10 transition-all">Withdraw</button>
+           <div className="flex gap-1">
+             <button onClick={() => setIsDepositOpen(true)} className="bg-blue-600 text-white px-2 py-1 rounded text-[8px] font-black uppercase shadow-md">Add</button>
+             <button onClick={() => alert("Withdrawal request submitted.")} className="border border-white/20 text-white px-2 py-1 rounded text-[8px] font-black uppercase">Withdraw</button>
            </div>
-           <button onClick={onLogout} className="text-gray-500 hover:text-white uppercase text-[9px] font-bold ml-2">Exit</button>
+           <button onClick={onLogout} className="text-gray-500 hover:text-white ml-1">
+             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+           </button>
         </div>
       </nav>
 
-      <div className="flex-1 flex overflow-hidden">
-        <div className="w-60 border-r border-[#2b2f36] bg-[#1e2329] flex flex-col">
-          <div className="p-3 text-gray-500 font-bold uppercase text-[9px] border-b border-white/5 tracking-widest">Market Watch</div>
-          <div className="flex-1 overflow-y-auto custom-scrollbar">
-            {pairs.map(s => (
-              <div key={s} onClick={() => setSelected(s)} className={`p-4 border-b border-white/[0.02] cursor-pointer transition-all ${selected === s ? 'bg-blue-600/20 border-l-4 border-l-blue-500' : 'hover:bg-white/5'}`}>
-                <div className="font-bold text-xs uppercase">{s}</div>
-                <div className="text-[9px] text-gray-600 uppercase">Forex Pair</div>
-              </div>
-            ))}
-          </div>
+      <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+        
+        {/* Market Watch - تحويل لـ Scroll أفقي في الموبايل وقائمة جانبية في الكمبيوتر */}
+        <div className="w-full md:w-60 border-r border-[#2b2f36] bg-[#1e2329] flex flex-row md:flex-col overflow-x-auto md:overflow-y-auto shrink-0 custom-scrollbar">
+          <div className="hidden md:block p-3 text-gray-500 font-bold uppercase text-[9px] border-b border-white/5 tracking-widest">Market Watch</div>
+          {pairs.map(s => (
+            <div 
+              key={s} 
+              onClick={() => setSelected(s)} 
+              className={`p-3 md:p-4 border-r md:border-r-0 md:border-b border-white/[0.02] cursor-pointer whitespace-nowrap transition-all ${selected === s ? 'bg-blue-600/20 border-b-2 border-b-blue-500 md:border-b-0 md:border-l-4 md:border-l-blue-500' : 'hover:bg-white/5'}`}
+            >
+              <div className="font-bold text-[11px] md:text-sm uppercase text-white">{s}</div>
+              <div className="hidden md:block text-[8px] text-gray-600 uppercase">Forex Pair</div>
+            </div>
+          ))}
         </div>
 
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="p-3 bg-[#181a20] border-b border-[#2b2f36] flex justify-between items-center">
-            <h2 className="text-lg font-bold text-white uppercase tracking-tighter">{selected}</h2>
-            <div className="flex items-center gap-3">
-               <div className="flex items-center bg-black rounded border border-white/10 h-8 overflow-hidden">
-                  <span className="px-2 text-[9px] text-gray-500 font-bold uppercase border-r border-white/5">Volume</span>
-                  <input type="number" value={volume} onChange={e => setVolume(parseFloat(e.target.value))} className="w-16 bg-transparent border-none text-white text-xs font-bold p-1 outline-none" step="0.01" />
+        <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+          {/* Trade Control Bar */}
+          <div className="p-2 md:p-3 bg-[#181a20] border-b border-[#2b2f36] flex justify-between items-center gap-2">
+            <h2 className="text-xs md:text-lg font-bold text-white uppercase tracking-tighter">{selected}</h2>
+            <div className="flex items-center gap-2">
+               <div className="flex items-center bg-black rounded border border-white/10 h-8 px-2">
+                  <span className="hidden xs:inline text-[8px] text-gray-500 uppercase font-bold mr-1">Lot</span>
+                  <input type="number" value={volume} onChange={e => setVolume(parseFloat(e.target.value))} className="w-10 md:w-16 bg-transparent border-none text-white text-[10px] font-bold outline-none" step="0.01" min="0.01" />
                </div>
                <div className="flex bg-[#1e2329] border border-[#2b2f36] rounded h-8 overflow-hidden shadow-xl">
-                  <button onClick={() => openOrder('SELL')} className="px-8 bg-red-600/20 text-red-500 border-r border-[#2b2f36] font-bold hover:bg-red-600 hover:text-white transition-all uppercase text-[10px]">Sell</button>
-                  <button onClick={() => openOrder('BUY')} className="px-8 bg-blue-600/20 text-blue-500 font-bold hover:bg-blue-600 hover:text-white transition-all uppercase text-[10px]">Buy</button>
+                  <button onClick={() => openOrder('SELL')} className="px-5 md:px-8 bg-red-600/20 text-red-500 border-r border-[#2b2f36] font-bold text-[9px] uppercase hover:bg-red-600">Sell</button>
+                  <button onClick={() => openOrder('BUY')} className="px-5 md:px-8 bg-blue-600/20 text-blue-500 font-bold text-[9px] uppercase hover:bg-blue-600">Buy</button>
                </div>
             </div>
           </div>
-          <div className="flex-1 bg-black">
-            <iframe src={`https://s.tradingview.com/widgetembed/?symbol=${selected === 'XAUUSD' ? 'OANDA:XAUUSD' : selected === 'NAS100' ? 'CAPITALCOM:US100' : 'FX_IDC:' + selected}&interval=1&theme=dark&style=1&locale=en`} className="w-full h-full border-none" />
+
+          {/* Chart Section - تملأ كامل المساحة المتبقية */}
+          <div className="flex-1 bg-black overflow-hidden relative min-h-[300px]">
+            <iframe 
+              src={`https://s.tradingview.com/widgetembed/?symbol=${selected === 'XAUUSD' ? 'OANDA:XAUUSD' : selected === 'NAS100' ? 'CAPITALCOM:US100' : 'FX_IDC:' + selected}&interval=1&theme=dark&style=1&locale=en&enable_publishing=false&hide_top_toolbar=false&allow_symbol_change=false`} 
+              className="w-full h-full border-none" 
+            />
           </div>
 
-          <div className="h-44 bg-[#181a20] border-t border-[#2b2f36] flex flex-col overflow-hidden">
-            <div className="p-2 bg-[#0b0e11] border-b border-[#2b2f36] flex gap-6 text-[10px] text-gray-400 font-bold uppercase overflow-x-auto whitespace-nowrap">
-               <div>Balance: <span className="text-white">{user.forexBalance.toFixed(2)}</span></div>
-               <div className={totalPL >= 0 ? 'text-green-400' : 'text-red-400'}>Equity: <span className="text-white">${equity.toFixed(2)}</span></div>
-               <div>Used Margin: <span className="text-white">${margin.toFixed(2)}</span></div>
-               <div>Free Margin: <span className={`font-bold ${freeMargin < 0 ? 'text-red-500' : 'text-green-400'}`}>${freeMargin.toFixed(2)}</span></div>
+          {/* MT5 Bottom Terminal - متجاوب */}
+          <div className="h-44 md:h-48 bg-[#181a20] border-t border-[#2b2f36] flex flex-col overflow-hidden shrink-0">
+            <div className="p-2 bg-[#0b0e11] border-b border-[#2b2f36] flex gap-4 text-[8px] sm:text-[10px] text-gray-400 font-bold uppercase overflow-x-auto whitespace-nowrap custom-scrollbar">
+               <div>Bal: <span className="text-white">${user.forexBalance.toFixed(2)}</span></div>
+               <div className={totalPL >= 0 ? 'text-green-400' : 'text-red-400'}>Eq: <span className="text-white">${equity.toFixed(2)}</span></div>
+               <div>Used: <span className="text-white">${margin.toFixed(2)}</span></div>
+               <div>Free: <span className={`font-bold ${freeMargin < 0 ? 'text-red-500' : 'text-green-400'}`}>${freeMargin.toFixed(2)}</span></div>
             </div>
             <div className="flex-1 overflow-auto custom-scrollbar">
                <table className="w-full text-left text-white text-[10px]">
-                <thead className="text-gray-500 border-b border-white/5 sticky top-0 bg-[#181a20]"><tr><th className="p-2">Symbol</th><th>Type</th><th>Vol</th><th>Open Price</th><th>Profit</th><th>Action</th></tr></thead>
+                <thead className="text-gray-500 border-b border-white/5 sticky top-0 bg-[#181a20]">
+                  <tr><th className="p-2">Symbol</th><th>Type</th><th>P/L</th><th className="text-right p-2">Action</th></tr>
+                </thead>
                 <tbody>
-                  {orders.map(o => {
-                    const pl = calculatePL(o);
-                    return (
-                      <tr key={o.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                        <td className="p-2 font-bold uppercase">{o.symbol}</td>
-                        <td className={o.type === 'BUY' ? 'text-blue-400' : 'text-red-400'}>{o.type}</td>
-                        <td>{o.volume.toFixed(2)}</td>
-                        <td className="font-mono">{o.openPrice.toFixed(5)}</td>
-                        <td className={`font-bold ${pl >= 0 ? 'text-green-400' : 'text-red-400'}`}>{pl.toFixed(2)}</td>
-                        <td><button onClick={() => closeOrder(o.id)} className="bg-red-500/20 hover:bg-red-600 text-white px-2 rounded uppercase text-[8px] font-bold py-1 transition-all">Close</button></td>
-                      </tr>
-                    );
-                  })}
+                  {orders.map(o => (
+                    <tr key={o.id} className="border-b border-white/5 hover:bg-white/5">
+                      <td className="p-2 font-bold uppercase">{o.symbol}</td>
+                      <td className={o.type === 'BUY' ? 'text-blue-400' : 'text-red-400'}>{o.type}</td>
+                      <td className={`font-bold ${calculatePL(o) >= 0 ? 'text-green-400' : 'text-red-400'}`}>{calculatePL(o).toFixed(2)}</td>
+                      <td className="text-right p-2"><button onClick={() => closeOrder(o.id)} className="bg-red-500/20 text-red-500 px-2 py-1 rounded font-bold">X</button></td>
+                    </tr>
+                  ))}
                 </tbody>
                </table>
+               {orders.length === 0 && <div className="text-center py-4 text-gray-600 uppercase text-[9px] font-bold">No active trades</div>}
             </div>
           </div>
         </div>
       </div>
 
-      {/* إضافة مكون نافذة الإيداع في نهاية الكود */}
-      <DepositModal 
-        isOpen={isDepositOpen} 
-        onClose={() => setIsDepositOpen(false)} 
-      />
+      <DepositModal isOpen={isDepositOpen} onClose={() => setIsDepositOpen(false)} user={user} />
     </div>
   );
 };
