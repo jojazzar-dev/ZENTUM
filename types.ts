@@ -28,16 +28,16 @@ export interface CryptoHolding {
   buyPrice: number;
 }
 
-// 3. هيكل الصفقات التاريخية (History) - جديد
+// 3. هيكل الصفقات التاريخية (History)
 export interface HistoryOrder {
   id: number;
   symbol: string;
   type: 'BUY' | 'SELL';
   openPrice: number;
-  closePrice: number; // السعر عند الإغلاق
-  volume: number;    // الكمية أو اللوت
-  profit: number;    // الربح أو الخسارة النهائية
-  timestamp: number; // وقت الإغلاق
+  closePrice: number; 
+  volume: number;    
+  profit: number;    
+  timestamp: number; 
   marketType: MarketType;
 }
 
@@ -49,19 +49,32 @@ export interface User {
   forexBalance: number;
   cryptoBalance: number;
   role: 'USER' | 'ADMIN';
-  emailVerified: boolean; // حالة تأكيد الإيميل - جديد
-  createdAt: number;      // تاريخ إنشاء الحساب - جديد
+  emailVerified: boolean; 
+  createdAt: number;      
   forexOrders?: ForexOrder[];
   cryptoHoldings?: CryptoHolding[];
-  tradeHistory?: HistoryOrder[]; // مصفوفة السجل التاريخي - جديد
+  tradeHistory?: HistoryOrder[]; 
 }
 
+// واجهة طلبات الإيداع
 export interface DepositRequest {
   id: string;
   userId: string;
   userEmail: string;
   amount: number;
   coin: string;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  timestamp: number;
+}
+
+// --- الجديد: واجهة طلبات السحب (Withdrawal System) ---
+export interface WithdrawRequest {
+  id: string;
+  userId: string;
+  userEmail: string;
+  amount: number;
+  walletAddress: string; // عنوان محفظة العميل الذي يريد الاستلام عليها
+  network: string;       // الشبكة (مثل TRC20 أو ERC20)
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   timestamp: number;
 }
