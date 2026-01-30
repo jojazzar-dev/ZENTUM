@@ -14,15 +14,30 @@ root.render(
   </React.StrictMode>
 );
 
-// --- كود تحويل الموقع إلى تطبيق (PWA Registration) ---
+// --- محرك تحويل الموقع إلى تطبيق (PWA Registration Engine) ---
+// هذا الكود هو المسؤول عن إظهار رسالة "Add to Home Screen"
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
+    // تسجيل ملف الخدمة من المسار الرئيسي لضمان تغطية كامل صفحات التداول
+    navigator.serviceWorker.register('/sw.js', { scope: '/' })
       .then(registration => {
-        console.log('ZENTUM PWA: ServiceWorker registered successfully');
+        console.log('ZENTUM PWA: Engine is Online and ready.');
+
+        // فحص التحديثات الجديدة لضمان دقة الأسعار دائماً
+        registration.onupdatefound = () => {
+          const installingWorker = registration.installing;
+          if (installingWorker == null) return;
+          installingWorker.onstatechange = () => {
+            if (installingWorker.state === 'installed') {
+              if (navigator.serviceWorker.controller) {
+                console.log('ZENTUM: New version available. Please refresh.');
+              }
+            }
+          };
+        };
       })
       .catch(error => {
-        console.log('ZENTUM PWA: ServiceWorker registration failed:', error);
+        console.error('ZENTUM PWA: System failed to start.', error);
       });
   });
 }

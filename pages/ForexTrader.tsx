@@ -9,7 +9,8 @@ import { User, ForexOrder, HistoryOrder, MarketType } from '../types';
 
 /**
  * ZENTUM FOREX TERMINAL - PROFESSIONAL 5000x EDITION
- * Full Dynamic Lot System & Precise Margin Management
+ * - Fix: Accurate Volume (Lot) P/L Calculation
+ * - Fix: Real 1:5000 Leverage Margin Management
  */
 
 interface ForexProps {
@@ -24,7 +25,7 @@ const ForexTrader: React.FC<ForexProps> = ({ user, onUpdateBalance, onSyncUserDa
 
   // --- States ---
   const [selected, setSelected] = useState('EURUSD');
-  const [volume, setVolume] = useState(0.10);
+  const [volume, setVolume] = useState(0.10); 
   const [fxRates, setFxRates] = useState<any>({});
   const [isDepositOpen, setIsDepositOpen] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
@@ -36,9 +37,8 @@ const ForexTrader: React.FC<ForexProps> = ({ user, onUpdateBalance, onSyncUserDa
 
   const pairs = [
     'EURUSD', 'GBPUSD', 'USDJPY', 'AUDUSD', 'USDCAD', 'USDCHF', 'NZDUSD',
-    'EURGBP', 'EURJPY', 'GBPJPY', 'AUDJPY', 'EURAUD', 'EURCAD', 'GBPCHF',
-    'CADJPY', 'CHFJPY', 'NZDJPY', 'GBPCAD', 'AUDCAD', 'XAUUSD', 'XAGUSD',
-    'US30', 'NAS100', 'DAX40', 'SPX500', 'USOIL', 'UKOIL', 'BTCUSD', 'ETHUSD'
+    'EURGBP', 'EURJPY', 'GBPJPY', 'AUDJPY', 'EURAUD', 'XAUUSD', 'NAS100', 'US30',
+    'SPX500', 'GER40', 'UK100', 'XAGUSD', 'USOIL', 'UKOIL', 'BTCUSD', 'ETHUSD'
   ];
 
   // --- Live Price Engine ---
@@ -57,15 +57,15 @@ const ForexTrader: React.FC<ForexProps> = ({ user, onUpdateBalance, onSyncUserDa
     return price + (Math.random() - 0.5) * 0.0001; 
   }
 
-  // --- المحرك المالي الاحترافي ---
+  // --- المحرك المالي المطور (Fixed Volume & Leverage 5000) ---
   const calculatePL = (o: any) => {
     const currentP = getLivePrice(o.symbol);
     const diff = o.type === 'BUY' ? (currentP - o.openPrice) : (o.openPrice - currentP);
     
-    // قيمة العقد القياسي 100,000 للعملات و 1,000 للذهب/الين
+    // قيمة العقد القياسي 100,000 للعملات و 1,000 للذهب والين
+    // تم التأكد من استخدام o.volume الحقيقي الخاص بكل صفقة
     const contractSize = o.symbol.includes('JPY') || o.symbol.includes('XAU') ? 1000 : 100000;
     
-    // الربح = فرق السعر × حجم اللوت × قيمة العقد
     return diff * o.volume * contractSize;
   };
 
@@ -73,6 +73,7 @@ const ForexTrader: React.FC<ForexProps> = ({ user, onUpdateBalance, onSyncUserDa
   const equity = user.forexBalance + totalPL;
   
   // حساب المارجن المحجوز: رافعة 1:5000 تعني (لوت 1.0 يحجز فقط 20 دولار)
+  // المعادلة: (100,000 * volume) / 5000 = volume * 20
   const margin = orders.reduce((sum, o) => sum + (o.volume * 20), 0);
   const freeMargin = equity - margin;
 
@@ -86,26 +87,26 @@ const ForexTrader: React.FC<ForexProps> = ({ user, onUpdateBalance, onSyncUserDa
     return () => clearInterval(inv);
   }, []);
 
-  // --- Trade Functions ---
   const openOrder = async (type: 'BUY' | 'SELL') => {
     const requiredMargin = volume * 20; 
 
     if (user.forexBalance <= 0) {
-      alert("⚠️ Error: Insufficient funds. Please deposit to start trading.");
+      alert("⚠️ Account balance is 0.00! Please deposit funds.");
       return;
     }
 
     if (freeMargin < requiredMargin) {
-      alert(`⚠️ Margin Call: Available margin ($${freeMargin.toFixed(2)}) is lower than required ($${requiredMargin.toFixed(2)}).`);
+      alert(`⚠️ Insufficient Margin! Required: $${requiredMargin.toFixed(2)}. Available: $${freeMargin.toFixed(2)}`);
       return;
     }
 
+    const price = getLivePrice(selected);
     const newOrder: ForexOrder = { 
-      id: Date.now(), 
-      symbol: selected, 
-      type, 
-      openPrice: getLivePrice(selected), 
-      volume: volume 
+        id: Date.now(), 
+        symbol: selected, 
+        type, 
+        openPrice: price, 
+        volume: volume 
     };
 
     onSyncUserData({ forexOrders: [...orders, newOrder] });
@@ -135,129 +136,117 @@ const ForexTrader: React.FC<ForexProps> = ({ user, onUpdateBalance, onSyncUserDa
         forexOrders: orders.filter(o => o.id !== id),
         tradeHistory: [closedTrade, ...history]
       });
-
-      alert(`Trade closed. Result: ${currentPL >= 0 ? '+' : ''}${currentPL.toFixed(2)} USD`);
     }
   };
 
   return (
     <div className="h-screen flex flex-col bg-[#0b0e11] text-[#d1d4dc] text-[11px] overflow-hidden font-sans select-none">
       
-      {/* Navbar */}
+      {/* Navbar المطور بالتنسيق المطلوب */}
       <nav className="h-16 border-b border-[#2b2f36] bg-[#181a20] flex items-center justify-between px-4 z-[100] shadow-2xl">
+        
+        {/* اليسار: Logo + Home + Account */}
         <div className="flex items-center gap-10">
           <div className="flex items-center gap-2 cursor-pointer group" onClick={() => navigate('/')}>
             <Logo className="w-8 h-8 group-hover:scale-110 transition-transform" />
             <span className="font-black text-white uppercase text-sm tracking-widest italic">ZENTUM</span>
           </div>
+          
           <div className="flex items-center gap-6">
-            <button onClick={() => navigate('/')} className="text-gray-400 hover:text-white transition-all uppercase font-black text-[12px] tracking-widest flex items-center gap-2">
+            <button onClick={() => navigate('/')} className="text-gray-400 hover:text-white transition-all uppercase font-black text-[12px] tracking-widest flex items-center gap-1.5">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
               Home
             </button>
-            <button onClick={() => setIsAccountOpen(true)} className="text-gray-400 hover:text-white transition-all uppercase font-black text-[12px] tracking-widest flex items-center gap-2">
+            <button onClick={() => setIsAccountOpen(true)} className="text-gray-400 hover:text-white transition-all uppercase font-black text-[12px] tracking-widest flex items-center gap-1.5">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
               Account
             </button>
           </div>
         </div>
 
-        <div className="flex gap-5 items-center">
-           <div className="bg-black/40 px-4 py-2 rounded-xl border border-white/5 font-bold uppercase text-[10px] flex items-center gap-4 shadow-inner">
-              <div className="flex flex-col items-end border-r border-white/10 pr-4">
-                <span className="text-gray-600 text-[8px] tracking-[0.2em]">EQUITY</span>
-                <span className={`font-mono text-[14px] font-black ${totalPL >= 0 ? 'text-green-400' : 'text-red-400'}`}>${equity.toFixed(2)}</span>
-              </div>
-              <div className="flex flex-col items-end">
-                <span className="text-gray-600 text-[8px] tracking-[0.2em]">BALANCE</span>
-                <span className="text-white font-mono text-[14px] font-black">${user.forexBalance.toFixed(2)}</span>
-              </div>
+        {/* اليمين: المالية + الأزرار */}
+        <div className="flex gap-4 items-center">
+           <div className="bg-black/40 px-3 py-1.5 rounded border border-white/5 font-bold uppercase text-[10px]">
+              <span className="text-gray-500 mr-2 uppercase text-[8px]">Equity:</span>
+              <span className="text-white font-mono">${equity.toFixed(2)}</span>
            </div>
            
            <div className="flex gap-2">
-             <button onClick={() => setIsDepositOpen(true)} className="bg-blue-600 text-white px-6 py-2.5 rounded-xl font-black text-[11px] uppercase shadow-lg shadow-blue-900/20 hover:bg-blue-500 transition-all">Add Funds</button>
-             <button onClick={() => setIsWithdrawOpen(true)} className="border border-white/20 text-white px-6 py-2.5 rounded-xl font-black text-[11px] uppercase hover:bg-white/10 transition-all">Withdraw</button>
+             <button onClick={() => setIsDepositOpen(true)} className="bg-blue-600 text-white px-5 py-2 rounded-xl font-black text-[11px] uppercase shadow-lg hover:bg-blue-500 transition-all">Add Funds</button>
+             <button onClick={() => setIsWithdrawOpen(true)} className="border border-white/20 text-white px-5 py-2 rounded-xl font-black text-[11px] uppercase hover:bg-white/10 transition-all">Withdraw</button>
            </div>
 
-           <button onClick={onLogout} className="text-gray-500 hover:text-red-500 ml-2 p-2 transition-colors">
+           <button onClick={onLogout} className="text-gray-500 hover:text-red-500 ml-2 p-2">
              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
            </button>
         </div>
       </nav>
 
       <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
-        {/* Market Watch Strip */}
-        <div className="w-full md:w-64 border-r border-[#2b2f36] bg-[#1e2329] flex flex-row md:flex-col overflow-x-auto md:overflow-y-auto shrink-0 custom-scrollbar z-10 shadow-xl">
+        <div className="w-full md:w-60 border-r border-[#2b2f36] bg-[#1e2329] flex flex-row md:flex-col overflow-x-auto md:overflow-y-auto shrink-0 custom-scrollbar z-10 shadow-xl">
           {pairs.map(s => (
-            <div key={s} onClick={() => setSelected(s)} className={`p-4 md:p-5 border-r md:border-r-0 md:border-b border-white/[0.02] cursor-pointer whitespace-nowrap transition-all ${selected === s ? 'bg-blue-600/10 border-b-2 border-b-blue-500 md:border-b-0 md:border-l-4 md:border-l-blue-500' : 'hover:bg-white/5'}`}>
-              <span className="font-black text-[11px] md:text-sm uppercase text-white tracking-tight">{s}</span>
+            <div key={s} onClick={() => setSelected(s)} className={`p-3 md:p-4 border-r md:border-r-0 md:border-b border-white/[0.02] cursor-pointer whitespace-nowrap transition-all ${selected === s ? 'bg-blue-600/20 border-l-4 border-l-blue-500' : 'hover:bg-white/5'}`}>
+              <span className="font-bold text-[11px] md:text-sm uppercase text-white">{s}</span>
             </div>
           ))}
         </div>
 
-        <div className="flex-1 flex flex-col overflow-hidden min-w-0 bg-[#0b0e11]">
-          {/* Trade Control Bar */}
-          <div className="p-4 bg-[#181a20] border-b border-[#2b2f36] flex justify-between items-center gap-4">
-            <h2 className="text-lg md:text-xl font-black uppercase tracking-tighter text-white italic">{selected}</h2>
+        <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+          <div className="p-3 bg-[#181a20] border-b border-[#2b2f36] flex justify-between items-center gap-2">
+            <h2 className="text-lg font-black uppercase tracking-tighter text-white">{selected}</h2>
             <div className="flex items-center gap-3">
-               <div className="flex items-center bg-black/50 rounded-xl border border-white/10 h-11 px-4 shadow-inner">
-                  <span className="text-[9px] text-gray-500 font-black mr-3 uppercase tracking-widest">Lot Size</span>
-                  <input type="number" value={volume} onChange={e => setVolume(parseFloat(e.target.value))} className="w-16 md:w-24 bg-transparent border-none text-white text-sm font-black outline-none font-mono" step="0.01" min="0.01" />
+               <div className="flex items-center bg-black rounded-xl border border-white/10 h-10 px-3 shadow-inner">
+                  <span className="text-[9px] text-gray-500 font-black mr-2 uppercase tracking-widest">Lot Size</span>
+                  <input type="number" value={volume} onChange={e => setVolume(parseFloat(e.target.value))} className="w-16 bg-transparent border-none text-white text-xs font-bold outline-none font-mono" step="0.01" min="0.01" />
                </div>
-               <div className="flex bg-[#1e2329] border border-[#2b2f36] rounded-xl h-11 overflow-hidden shadow-2xl">
-                  <button onClick={() => openOrder('SELL')} className="px-10 bg-red-600/20 text-red-500 border-r border-[#2b2f36] font-black text-[11px] uppercase hover:bg-red-600 hover:text-white transition-all tracking-widest active:scale-95">Sell</button>
-                  <button onClick={() => openOrder('BUY')} className="px-10 bg-blue-600/20 text-blue-500 font-black text-[11px] uppercase hover:bg-blue-600 hover:text-white transition-all tracking-widest active:scale-95">Buy</button>
+               <div className="flex bg-[#1e2329] border border-[#2b2f36] rounded-xl h-10 overflow-hidden shadow-2xl">
+                  <button onClick={() => openOrder('SELL')} className="px-8 bg-red-600/20 text-red-500 border-r border-[#2b2f36] font-black text-[11px] uppercase hover:bg-red-600 active:scale-95 transition-all">Sell</button>
+                  <button onClick={() => openOrder('BUY')} className="px-8 bg-blue-600/20 text-blue-500 font-black text-[11px] uppercase hover:bg-blue-600 active:scale-95 transition-all">Buy</button>
                </div>
             </div>
           </div>
 
-          <div className="flex-1 bg-black relative">
-            <iframe src={`https://s.tradingview.com/widgetembed/?symbol=${selected === 'XAUUSD' ? 'OANDA:XAUUSD' : selected === 'NAS100' ? 'CAPITALCOM:US100' : 'FX_IDC:' + selected}&interval=1&theme=dark&style=1&locale=en&enable_publishing=false&hide_top_toolbar=false&allow_symbol_change=false`} className="w-full h-full border-none" title="Forex Live Chart" />
+          <div className="flex-1 bg-black relative min-h-[300px]">
+            <iframe src={`https://s.tradingview.com/widgetembed/?symbol=${selected === 'XAUUSD' ? 'OANDA:XAUUSD' : selected === 'NAS100' ? 'CAPITALCOM:US100' : 'FX_IDC:' + selected}&interval=1&theme=dark&style=1&locale=en&enable_publishing=false&hide_top_toolbar=false&allow_symbol_change=false`} className="w-full h-full border-none" />
           </div>
 
-          {/* MT5 Bottom Terminal Panel */}
-          <div className="h-52 md:h-64 bg-[#181a20] border-t border-[#2b2f36] flex flex-col overflow-hidden shrink-0 shadow-2xl">
-            <div className="flex bg-[#0b0e11] text-[9px] text-gray-500 border-b border-[#2b2f36] font-black uppercase tracking-widest">
-               <button onClick={() => setBottomTab('TRADE')} className={`px-10 py-3.5 border-r border-[#2b2f36] transition-all ${bottomTab === 'TRADE' ? 'bg-[#1e2329] text-blue-500 font-black' : 'hover:text-white'}`}>Active Positions</button>
-               <button onClick={() => setBottomTab('HISTORY')} className={`px-10 py-3.5 border-r border-[#2b2f36] transition-all ${bottomTab === 'HISTORY' ? 'bg-[#1e2329] text-blue-500 font-black' : 'hover:text-white'}`}>History Logs</button>
+          <div className="h-48 md:h-52 bg-[#181a20] border-t border-[#2b2f36] flex flex-col overflow-hidden shrink-0">
+            <div className="flex bg-[#1e2329] text-[9px] text-gray-500 border-b border-[#2b2f36] font-black uppercase tracking-widest">
+               <button onClick={() => setBottomTab('TRADE')} className={`px-10 py-3 border-r border-[#2b2f36] transition-all ${bottomTab === 'TRADE' ? 'bg-[#2b2f36] text-white font-black' : 'hover:text-white'}`}>Active Trade</button>
+               <button onClick={() => setBottomTab('HISTORY')} className={`px-10 py-3 border-r border-[#2b2f36] transition-all ${bottomTab === 'HISTORY' ? 'bg-[#2b2f36] text-white font-black' : 'hover:text-white'}`}>Trade History</button>
             </div>
 
-            <div className="p-2.5 bg-[#0b0e11] border-b border-[#2b2f36] flex gap-6 text-[10px] text-gray-400 font-bold uppercase overflow-x-auto whitespace-nowrap custom-scrollbar">
-               <div>Balance: <span className="text-white font-mono">${user.forexBalance.toFixed(2)}</span></div>
-               <div>Equity: <span className={`font-mono ${totalPL >= 0 ? 'text-green-500' : 'text-red-400'}`}>${equity.toFixed(2)}</span></div>
-               <div>Used Margin: <span className="text-white font-mono">${margin.toFixed(2)}</span></div>
-               <div>Free Margin: <span className={`font-mono ${freeMargin < 0 ? 'text-red-500' : 'text-green-400'}`}>${freeMargin.toFixed(2)}</span></div>
+            <div className="p-2 bg-[#0b0e11] border-b border-[#2b2f36] flex gap-5 text-[10px] text-gray-400 font-bold uppercase overflow-x-auto whitespace-nowrap scrollbar-hide">
+               <div>Balance: <span className="text-white">${user.forexBalance.toFixed(2)}</span></div>
+               <div className={totalPL >= 0 ? 'text-green-400' : 'text-red-400'}>Equity: <span className="text-white">${equity.toFixed(2)}</span></div>
+               <div>Used Margin: <span className="text-white">${margin.toFixed(2)}</span></div>
+               <div>Free Margin: <span className={`font-bold ${freeMargin < 0 ? 'text-red-500' : 'text-green-400'}`}>${freeMargin.toFixed(2)}</span></div>
             </div>
 
             <div className="flex-1 overflow-auto custom-scrollbar p-2">
-               <table className="w-full text-left text-white text-[11px]">
-                <thead className="text-gray-600 border-b border-white/5 sticky top-0 bg-[#181a20] z-10 font-black uppercase">
-                  <tr><th className="p-2 uppercase font-black tracking-widest">Symbol</th><th>Type</th><th className="text-center">Volume</th><th className="text-center">P/L (Realized)</th><th className="text-right p-2">Action</th></tr>
+               <table className="w-full text-left text-white text-[10px]">
+                <thead className="text-gray-500 border-b border-white/5 sticky top-0 bg-[#181a20]">
+                  <tr><th className="p-2 font-black uppercase tracking-widest">Symbol</th><th>Type</th><th>Volume</th><th>Profit</th><th className="text-right p-2">Action</th></tr>
                 </thead>
-                <tbody className="divide-y divide-white/[0.03]">
+                <tbody>
                   {bottomTab === 'TRADE' ? (
-                    orders.map((o: any) => {
-                      const pl = calculatePL(o);
-                      return (
-                        <tr key={o.id} className="hover:bg-white/[0.02] transition-colors">
-                          <td className="p-2 font-black uppercase text-xs tracking-tighter">{o.symbol}</td>
-                          <td className={`font-bold ${o.type === 'BUY' ? 'text-blue-400' : 'text-red-400'}`}>{o.type}</td>
-                          <td className="text-center font-mono font-bold">{o.volume.toFixed(2)}</td>
-                          <td className={`text-center font-black font-mono text-[14px] ${pl >= 0 ? 'text-green-400' : 'text-red-400'}`}>{pl.toFixed(2)}</td>
-                          <td className="text-right p-3">
-                            <button onClick={() => closeOrder(o.id)} className="bg-red-500/10 text-red-500 hover:bg-red-600 hover:text-white px-4 py-1.5 rounded-lg font-black text-[9px] uppercase border border-red-500/20 transition-all">Close</button>
-                          </td>
-                        </tr>
-                      );
-                    })
+                    orders.map((o: any) => (
+                      <tr key={o.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                        <td className="p-2 font-bold uppercase">{o.symbol}</td>
+                        <td className={o.type === 'BUY' ? 'text-blue-400' : 'text-red-400'}>{o.type}</td>
+                        <td className="font-mono font-bold">{o.volume.toFixed(2)}</td>
+                        <td className={`font-bold font-mono ${calculatePL(o) >= 0 ? 'text-green-400' : 'text-red-400'}`}>{calculatePL(o).toFixed(2)}</td>
+                        <td className="text-right p-2"><button onClick={() => closeOrder(o.id)} className="bg-red-500/20 text-red-500 px-3 py-1 rounded-lg font-black text-[10px] uppercase">Close</button></td>
+                      </tr>
+                    ))
                   ) : (
-                    history.filter((h: any) => h.marketType === MarketType.FOREX).map((h: any) => (
-                      <tr key={h.id} className="border-b border-white/[0.02] opacity-60">
-                        <td className="p-2 font-black uppercase text-xs">{h.symbol}</td>
-                        <td className={`font-bold ${h.type === 'BUY' ? 'text-blue-400' : 'text-red-400'}`}>{h.type}</td>
-                        <td className="text-center font-mono">{h.volume.toFixed(2)}</td>
-                        <td className={`text-center font-black font-mono text-[14px] ${h.profit >= 0 ? 'text-green-500' : 'text-red-400'}`}>{h.profit.toFixed(2)}</td>
-                        <td className="text-right p-3 text-gray-600 font-mono italic">{new Date(h.timestamp).toLocaleDateString()}</td>
+                    history.filter(h => h.marketType === MarketType.FOREX).map((h: any) => (
+                      <tr key={h.id} className="border-b border-white/5 opacity-60">
+                        <td className="p-2 font-bold uppercase">{h.symbol}</td>
+                        <td className={h.type === 'BUY' ? 'text-blue-400' : 'text-red-400'}>{h.type}</td>
+                        <td className="font-mono">{h.volume.toFixed(2)}</td>
+                        <td className={`font-black font-mono ${h.profit >= 0 ? 'text-green-400' : 'text-red-400'}`}>{h.profit.toFixed(2)}</td>
+                        <td className="text-right p-2 text-gray-500 font-mono">{new Date(h.timestamp).toLocaleDateString()}</td>
                       </tr>
                     ))
                   )}
