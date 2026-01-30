@@ -25,81 +25,83 @@ export const AuthService = {
     return emailRegex.test(email);
   },
 
+  // جلب كافة المستخدمين للوحة التحكم (MASTER CONSOLE)
   getAllUsers: async (): Promise<User[]> => {
     try {
       const querySnapshot = await getDocs(collection(db, "users"));
-      const users: User[] = [];
-      querySnapshot.forEach((docSnap) => {
-        users.push(docSnap.data() as User);
-      });
-      return users;
+      return querySnapshot.docs.map(doc => doc.data() as User);
     } catch (error) {
-      console.error("Master Console Error", error);
+      console.error("Cloud Database Error:", error);
       return [];
     }
   },
 
-  // 1. محرك تسجيل الدخول مع فحص التفعيل
+  // محرك تسجيل الدخول (يدعم الإدمن والمستخدمين مع جلب البيانات اللحظية)
   login: async (email: string, password: string): Promise<{success: boolean, user?: User, message?: string}> => {
     const cleanEmail = email.trim().toUpperCase();
     const cleanPassword = password.trim();
 
     try {
-      // استثناء الإدمن من فحص التفعيل
+      // 1. منطق الإدمن الخارق (ZENTUM MASTER ADMIN)
       if (cleanEmail === 'ADMIN@ZENTUM' && cleanPassword === 'zentum13579@Z') {
-        const adminUser: User = {
-          id: 'zentum-master-root',
-          email: 'ADMIN@ZENTUM',
-          name: 'ZENTUM MASTER',
-          forexBalance: 999999.99,
-          cryptoBalance: 999999.99,
-          role: 'ADMIN',
-          emailVerified: true,
-          createdAt: Date.now(),
-          forexOrders: [],
-          cryptoHoldings: [],
-          tradeHistory: []
-        };
-        await setDoc(doc(db, "users", adminUser.id), adminUser, { merge: true });
-        localStorage.setItem(SESSION_KEY, JSON.stringify(adminUser));
-        return { success: true, user: adminUser };
+        const adminId = 'zentum-master-root';
+        const adminDoc = await getDoc(doc(db, "users", adminId));
+        
+        let adminData: User;
+        if (adminDoc.exists()) {
+          adminData = adminDoc.data() as User;
+        } else {
+          adminData = {
+            id: adminId,
+            email: 'ADMIN@ZENTUM',
+            name: 'ZENTUM MASTER',
+            forexBalance: 1000, 
+            cryptoBalance: 1000,
+            role: 'ADMIN',
+            emailVerified: true,
+            createdAt: Date.now(),
+            forexOrders: [],
+            cryptoHoldings: [],
+            tradeHistory: []
+          };
+          await setDoc(doc(db, "users", adminId), adminData);
+        }
+        localStorage.setItem(SESSION_KEY, JSON.stringify(adminData));
+        return { success: true, user: adminData };
       }
 
+      // 2. تسجيل دخول المستخدمين العاديين
       const userCredential = await signInWithEmailAndPassword(auth, email.trim(), password);
       const firebaseUser = userCredential.user;
 
-      // --- فحص إذا كان الإيميل مفعل ---
+      // التأكد من تفعيل الإيميل
       if (!firebaseUser.emailVerified) {
         await signOut(auth);
-        return { success: false, message: "Please verify your email address. Check your inbox for the activation link." };
+        return { success: false, message: "Please verify your email. Check your inbox for the activation link." };
       }
 
       const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
       if (userDoc.exists()) {
         const userData = userDoc.data() as User;
-        // تحديث حالة التفعيل في Firestore إذا تغيرت
-        if (!userData.emailVerified) {
-            await updateDoc(doc(db, "users", firebaseUser.uid), { emailVerified: true });
-            userData.emailVerified = true;
-        }
         localStorage.setItem(SESSION_KEY, JSON.stringify(userData));
         return { success: true, user: userData };
       }
-      return { success: false, message: "User profile missing." };
+      return { success: false, message: "User profile record not found." };
 
     } catch (error: any) {
-      return { success: false, message: "Invalid credentials or unverified account." };
+      console.error("Login Error:", error.code);
+      return { success: false, message: "Invalid email or password." };
     }
   },
 
-  // 2. محرك التسجيل مع إرسال رابط التفعيل
+  // محرك التسجيل (إنشاء الهوية السحابية وتهيئة المحفظة)
   register: async (email: string, password: string, name: string): Promise<{success: boolean, user?: User, message?: string}> => {
     try {
       const cleanEmail = email.trim();
       const userCredential = await createUserWithEmailAndPassword(auth, cleanEmail, password);
       const firebaseUser = userCredential.user;
 
-      // إرسال رسالة التحقق فوراً
+      // إرسال رابط تفعيل الحساب فوراً
       await sendEmailVerification(firebaseUser);
 
       const newUser: User = {
@@ -117,42 +119,42 @@ export const AuthService = {
       };
 
       await setDoc(doc(db, "users", firebaseUser.uid), newUser);
-      // لا نحفظ الجلسة هنا لأننا سنطلب منه التفعيل أولاً
       return { success: true, user: newUser };
     } catch (error: any) {
       return { success: false, message: error.message };
     }
   },
 
-  // 3. تحديث البيانات الشامل (بما فيها السجل التاريخي)
+  // محرك المزامنة السحابي (يحفظ كل شيء: رصيد، صفقات، سجل)
   updateCurrentUser: async (updatedUser: User): Promise<void> => {
     try {
-      localStorage.setItem(SESSION_KEY, JSON.stringify(updatedUser));
       const userRef = doc(db, "users", updatedUser.id);
+      // تحديث كافة الحقول في السحابة لضمان ظهورها في جميع الأجهزة
       await updateDoc(userRef, {
         forexBalance: updatedUser.forexBalance,
         cryptoBalance: updatedUser.cryptoBalance,
         forexOrders: updatedUser.forexOrders || [],
         cryptoHoldings: updatedUser.cryptoHoldings || [],
         tradeHistory: updatedUser.tradeHistory || [],
-        emailVerified: updatedUser.emailVerified
+        emailVerified: updatedUser.emailVerified || false
       });
     } catch (error) {
-      console.error("Cloud Sync Failed", error);
+      console.error("Cloud Sync Failed:", error);
     }
   },
 
-  // 4. دالة الإدمن لحذف المستخدم نهائياً من Firestore
+  // دالة الإدمن لحذف المستخدم نهائياً من السحاب
   deleteUserAccount: async (userId: string): Promise<boolean> => {
     try {
       await deleteDoc(doc(db, "users", userId));
       return true;
     } catch (error) {
-      console.error("Delete Error", error);
+      console.error("Admin Delete Error:", error);
       return false;
     }
   },
 
+  // دالة الإدمن لتعديل بيانات أي مستخدم (تنعكس فوراً عند المستخدم)
   adminUpdateUser: async (targetUser: User): Promise<void> => {
     try {
       const userRef = doc(db, "users", targetUser.id);
@@ -163,7 +165,7 @@ export const AuthService = {
         tradeHistory: targetUser.tradeHistory || []
       });
     } catch (error) {
-      console.error("Admin Update Error", error);
+      console.error("Admin Sync Error:", error);
     }
   },
 
