@@ -44,6 +44,7 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
     return () => clearInterval(inv);
   }, []);
 
+  // --- محرك التداول المطور لمنع تضارب الرصيد ---
   const handleTrade = async (type: 'BUY' | 'SELL') => {
     const price = livePrices[selected]?.USD || 0;
     if (price === 0) return alert("Market data loading...");
@@ -54,26 +55,58 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
         alert("⚠️ Insufficient Balance!");
         return;
       }
-      onUpdateBalance('crypto', -cost);
-      const newHolding: CryptoHolding = { id: Date.now(), symbol: selected, qty: volume, buyPrice: price };
-      onSyncUserData({ cryptoHoldings: [...holdings, newHolding] });
-      alert(`Successfully added ${volume} ${selected} to cloud.`);
+
+      // حساب الرصيد الجديد يدوياً لضمان التزامن
+      const updatedCryptoBalance = user.cryptoBalance - cost;
+      
+      const newHolding: CryptoHolding = { 
+        id: Date.now(),
+        symbol: selected, 
+        qty: volume, 
+        buyPrice: price 
+      };
+
+      // إرسال تحديث سحابي واحد يحتوي على (الرصيد الجديد + الأصول الجديدة)
+      onSyncUserData({ 
+        cryptoBalance: updatedCryptoBalance,
+        cryptoHoldings: [...holdings, newHolding] 
+      });
+      
+      alert(`Success! Purchased ${volume} ${selected}`);
+
     } else {
       const assetIndex = holdings.findIndex(h => h.symbol === selected);
       if (assetIndex > -1) {
         const asset = holdings[assetIndex];
         const gain = asset.qty * price;
         const profit = gain - (asset.qty * asset.buyPrice);
+
+        // حساب الرصيد الجديد يدوياً
+        const updatedCryptoBalance = user.cryptoBalance + gain;
+
         const historyItem: HistoryOrder = {
-          id: Date.now(), symbol: asset.symbol, type: 'SELL', openPrice: asset.buyPrice,
-          closePrice: price, volume: asset.qty, profit: profit, timestamp: Date.now(),
+          id: Date.now(), 
+          symbol: asset.symbol, 
+          type: 'SELL', 
+          openPrice: asset.buyPrice,
+          closePrice: price, 
+          volume: asset.qty, 
+          profit: profit, 
+          timestamp: Date.now(),
           marketType: MarketType.CRYPTO
         };
-        onUpdateBalance('crypto', gain);
+
         const updatedHoldings = [...holdings];
         updatedHoldings.splice(assetIndex, 1);
-        onSyncUserData({ cryptoHoldings: updatedHoldings, tradeHistory: [historyItem, ...history] });
-        alert(`Asset sold. Profit: ${profit.toFixed(2)} USDT`);
+        
+        // إرسال تحديث سحابي واحد يحتوي على (الرصيد الجديد + الأصول المحدثة + السجل التاريخي)
+        onSyncUserData({ 
+          cryptoBalance: updatedCryptoBalance,
+          cryptoHoldings: updatedHoldings, 
+          tradeHistory: [historyItem, ...history] 
+        });
+
+        alert(`Asset sold. Profit/Loss: ${profit.toFixed(2)} USDT`);
       } else {
         alert("⚠️ You don't own this asset.");
       }
@@ -83,10 +116,9 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
   return (
     <div className="h-screen flex flex-col bg-[#0b0e11] text-white overflow-hidden font-sans select-none text-[11px]">
       
-      {/* --- Navbar المطور بآخر التعديلات --- */}
-      <nav className="h-16 border-b border-white/5 bg-[#181a20] flex items-center justify-between px-6 z-[100]">
+      {/* --- Navbar الاحترافي المحدث --- */}
+      <nav className="h-16 border-b border-white/5 bg-[#181a20] flex items-center justify-between px-4 z-[100]">
         
-        {/* جهة اليسار: Logo + Home + Account بجانب بعضهما بخط كبير */}
         <div className="flex items-center gap-10">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
             <Logo className="w-8 h-8" />
@@ -105,16 +137,15 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
           </div>
         </div>
         
-        {/* جهة اليمين: Balance + Deposit + Withdraw + Logout */}
         <div className="flex items-center gap-4">
           <div className="flex flex-col items-end mr-4">
-            <span className="text-[9px] text-gray-500 uppercase font-black tracking-widest leading-none">Available Balance</span>
+            <span className="text-[9px] text-gray-500 uppercase font-black tracking-widest">Available Balance</span>
             <span className="text-[15px] font-mono font-bold text-yellow-500">{user.cryptoBalance.toLocaleString(undefined, {minimumFractionDigits: 2})} <span className="text-[10px] text-gray-400 uppercase">USDT</span></span>
           </div>
 
           <div className="flex items-center gap-2">
             <button onClick={() => setIsDepositOpen(true)} className="bg-yellow-600 text-black px-6 py-2 rounded-xl font-black text-[11px] uppercase shadow-lg hover:bg-yellow-500 transition-all">Deposit</button>
-            <button onClick={() => alert("Withdrawal request initialized.")} className="border border-white/20 text-white px-6 py-2 rounded-xl font-black text-[11px] uppercase hover:bg-white/10 transition-all">Withdraw</button>
+            <button onClick={() => alert("Withdrawal request pending admin review.")} className="border border-white/20 text-white px-6 py-2 rounded-xl font-black text-[11px] uppercase hover:bg-white/10 transition-all">Withdraw</button>
           </div>
           
           <button onClick={onLogout} className="text-gray-500 hover:text-red-500 transition-colors ml-4 p-2">
@@ -124,17 +155,15 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
       </nav>
 
       <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
-        {/* Market Sidebar */}
         <div className="w-full md:w-60 border-r border-white/5 bg-[#1e2329] flex flex-row md:flex-col overflow-x-auto md:overflow-y-auto shrink-0 custom-scrollbar">
           {coins.map(c => (
-            <div key={c.s} onClick={() => setSelected(c.s)} className={`p-3 md:p-4 border-r md:border-r-0 md:border-b border-white/[0.02] cursor-pointer whitespace-nowrap transition-all ${selected === c.s ? 'bg-yellow-500/10 border-l-4 border-l-yellow-500' : 'hover:bg-white/5'}`}>
+            <div key={c.s} onClick={() => setSelected(c.s)} className={`p-3 md:p-4 border-r md:border-r-0 md:border-b border-white/[0.02] cursor-pointer whitespace-nowrap transition-all ${selected === c.s ? 'bg-yellow-500/10 border-b-2 border-b-yellow-500 md:border-b-0 md:border-l-4 md:border-l-yellow-500' : 'hover:bg-white/5'}`}>
               <div className="font-bold text-xs uppercase text-white">{c.s} / USDT</div>
               <div className="hidden md:block text-[9px] text-gray-500 uppercase">{c.n}</div>
             </div>
           ))}
         </div>
 
-        {/* Trade Workspace */}
         <div className="flex-1 flex flex-col overflow-hidden min-w-0">
           <div className="p-3 bg-[#181A20] border-b border-white/5 flex justify-between items-center gap-2">
             <h2 className="text-lg font-black uppercase tracking-tighter text-white">{selected} / USDT</h2>
@@ -160,9 +189,9 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
              </div>
              
              <div className="flex-1 overflow-y-auto custom-scrollbar p-3">
-                <table className="w-full text-left text-[11px]">
+                <table className="w-full text-left text-[10px]">
                    <thead className="text-gray-600 border-b border-white/5 uppercase font-black tracking-widest">
-                     <tr><th className="p-2">Asset</th><th>Quantity</th><th>Entry</th><th className="text-right p-2">{bottomTab === 'ASSETS' ? 'Net P/L' : 'Closed Result'}</th></tr>
+                     <tr><th className="p-1">Asset</th><th>Quantity</th><th>Entry Price</th><th className="text-right p-1">{bottomTab === 'ASSETS' ? 'Net P/L' : 'Date'}</th></tr>
                    </thead>
                    <tbody className="text-gray-300">
                      {bottomTab === 'ASSETS' ? (
@@ -171,10 +200,10 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
                          const pl = currentVal - (h.qty * h.buyPrice);
                          return (
                            <tr key={h.id} className="border-b border-white/[0.02]">
-                             <td className="p-2 font-bold text-white uppercase">{h.symbol}</td>
+                             <td className="p-1.5 font-bold text-white uppercase">{h.symbol}</td>
                              <td className="font-mono">{h.qty.toFixed(4)}</td>
-                             <td className="text-gray-500">${h.buyPrice.toLocaleString()}</td>
-                             <td className={`text-right p-2 font-black font-mono ${pl >= 0 ? 'text-green-500' : 'text-red-400'}`}>
+                             <td className="text-gray-500 font-mono">${h.buyPrice.toLocaleString()}</td>
+                             <td className={`text-right p-1.5 font-black font-mono ${pl >= 0 ? 'text-green-500' : 'text-red-400'}`}>
                                {pl >= 0 ? '+' : ''}{pl.toFixed(2)}
                              </td>
                            </tr>
@@ -183,12 +212,12 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
                      ) : (
                        history.filter(h => h.marketType === MarketType.CRYPTO).map((h: any) => (
                          <tr key={h.id} className="border-b border-white/[0.02] opacity-60">
-                           <td className="p-2 font-bold text-white uppercase">{h.symbol}</td>
-                           <td className={`font-black ${h.profit >= 0 ? 'text-green-500' : 'text-red-400'}`}>
+                           <td className="p-1.5 font-bold text-white uppercase">{h.symbol}</td>
+                           <td className={`font-black font-mono ${h.profit >= 0 ? 'text-green-500' : 'text-red-400'}`}>
                              {h.profit >= 0 ? '+' : ''}{h.profit.toFixed(2)}
                            </td>
-                           <td className="text-gray-500">${h.closePrice.toLocaleString()}</td>
-                           <td className="text-right p-2 text-gray-600 font-mono">{new Date(h.timestamp).toLocaleDateString()}</td>
+                           <td className="text-gray-500 font-mono">${h.closePrice.toLocaleString()}</td>
+                           <td className="text-right p-1.5 text-gray-600 font-mono">{new Date(h.timestamp).toLocaleDateString()}</td>
                          </tr>
                        ))
                      )}
