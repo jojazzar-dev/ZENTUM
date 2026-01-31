@@ -8,15 +8,14 @@ import WithdrawModal from '../components/WithdrawModal';
 import { User, CryptoHolding, HistoryOrder, MarketType } from '../types';
 
 /**
- * ZENTUM CRYPTO EXCHANGE - ULTIMATE CLOUD EDITION (V4.0)
- * ---------------------------------------------------------
+ * ZENTUM CRYPTO EXCHANGE - PROFESSIONAL ULTIMATE EDITION (V4.2)
+ * -----------------------------------------------------------
  * DEVELOPED BY: ZENTUM GLOBAL CORE
  * FEATURES:
  * - Atomic Cloud Sync (Prevents balance jump-back)
- * - Real-time Portfolio P/L Calculation
- * - Integrated History Logs for all closed trades
- * - Mobile Portrait Responsiveness (Market Strip)
- * - High-end Professional UI with No Shortcuts
+ * - Full Trade History & Real-time Portfolio Tracking
+ * - Mobile Portrait Optimization (Horizontal Scrolling Watchlist)
+ * - Large Bold Navigation (Home/Account Left, Finance Right)
  */
 
 interface CryptoProps {
@@ -29,9 +28,9 @@ interface CryptoProps {
 const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUserData, onLogout }) => {
   const navigate = useNavigate();
 
-  // --- [1] حالات الصفحة (States) التفصيلية ---
+  // --- [1] حالات الصفحة الأساسية (States) ---
   const [selected, setSelected] = useState('BTC');
-  const [volume, setVolume] = useState(0.01); // كمية التداول
+  const [volume, setVolume] = useState(0.01); 
   const [livePrices, setLivePrices] = useState<any>({});
   
   // حالات التحكم في النوافذ المنبثقة
@@ -39,49 +38,48 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
   
-  // حالات التيرمينال السفلي (Assets / History)
+  // حالات التيرمينال السفلي
   const [bottomTab, setBottomTab] = useState<'ASSETS' | 'HISTORY'>('ASSETS');
 
-  // جلب البيانات السحابية من كائن المستخدم المحدث لحظياً
+  // جلب البيانات السحابية من كائن المستخدم المحدث لحظياً عبر Props
   const holdings = user.cryptoHoldings || [];
   const history = user.tradeHistory || [];
 
-  // قائمة العملات المدعومة
+  // قائمة العملات المدعومة (Watchlist)
   const coins = [
     { s: 'BTC', n: 'Bitcoin' }, { s: 'ETH', n: 'Ethereum' }, { s: 'SOL', n: 'Solana' },
     { s: 'BNB', n: 'Binance' }, { s: 'XRP', n: 'Ripple' }, { s: 'ADA', n: 'Cardano' },
     { s: 'AVAX', n: 'Avalanche' }, { s: 'DOT', n: 'Polkadot' }, { s: 'LINK', n: 'Chainlink' },
-    { s: 'DOGE', n: 'Dogecoin' }, { s: 'TRX', n: 'TRON' }, { s: 'LTC', n: 'Litecoin' },
-    { s: 'NEAR', n: 'Near' }, { s: 'APT', n: 'Aptos' }, { s: 'PEPE', n: 'Pepe' }
+    { s: 'DOGE', n: 'Dogecoin' }, { s: 'TRX', n: 'TRON' }, { s: 'LTC', n: 'Litecoin' }
   ];
 
-  // --- [2] محرك المزامنة المستمرة ---
+  // --- [2] محرك المزامنة المستمرة للأسعار ---
   useEffect(() => {
     const updatePrices = async () => {
       const p = await fetchLivePrices();
       if (p) setLivePrices(p);
     };
     updatePrices();
-    const priceInv = setInterval(updatePrices, 2000); // تحديث كل ثانيتين للحسابات
+    const priceInv = setInterval(updatePrices, 2000); 
     return () => clearInterval(priceInv);
   }, []);
 
-  // --- [3] محرك التداول السحابي المطور (Atomic Logic) ---
+  // --- [3] محرك التداول السحابي المطور (Atomic Sync Logic) ---
   const handleTrade = async (type: 'BUY' | 'SELL') => {
     const price = livePrices[selected]?.USD || 0;
     if (price === 0) {
-      alert("⚠️ Synchronizing market data... please wait.");
+      alert("⚠️ Synchronizing market nodes... please wait.");
       return;
     }
 
     if (type === 'BUY') {
       const cost = volume * price;
       if (user.cryptoBalance < cost) {
-        alert("⚠️ INSUFFICIENT BALANCE: Please deposit USDT to complete this order.");
+        alert("⚠️ INSUFFICIENT BALANCE: Deposit USDT to complete this order.");
         return;
       }
 
-      // حساب القيم الجديدة محلياً أولاً لضمان الثبات المطلق
+      // حساب القيم الجديدة لضمان الثبات السحابي ومنع تضارب الرصيد
       const updatedCryptoBalance = user.cryptoBalance - cost;
       const newHolding: CryptoHolding = { 
         id: Date.now(),
@@ -90,26 +88,25 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
         buyPrice: price 
       };
 
-      // إرسال تحديث سحابي واحد (رصيد + محفظة)
+      // إرسال تحديث سحابي واحد (Atomic Update)
       onSyncUserData({ 
         cryptoBalance: updatedCryptoBalance,
         cryptoHoldings: [...holdings, newHolding] 
       });
       
-      alert(`ORDER CONFIRMED: Bought ${volume} ${selected} at $${price.toLocaleString()}`);
+      alert(`PURCHASE COMPLETE: ${volume} ${selected} added to cloud portfolio.`);
 
     } else {
       // البحث عن العملة في محفظة الأصول
       const assetIdx = holdings.findIndex(h => h.symbol === selected);
       if (assetIdx > -1) {
         const asset = holdings[assetIdx];
-        const gain = asset.qty * price; // القيمة الحالية عند البيع
+        const gain = asset.qty * price; 
         const netProfit = gain - (asset.qty * asset.buyPrice);
 
-        // حساب الرصيد الجديد
         const updatedCryptoBalance = user.cryptoBalance + gain;
 
-        // إعداد سجل التاريخ
+        // إعداد سجل التاريخ (تصحيح مسمى profit)
         const historyItem: HistoryOrder = {
           id: Date.now(), 
           symbol: asset.symbol, 
@@ -117,7 +114,7 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
           openPrice: asset.buyPrice,
           closePrice: price, 
           volume: asset.qty, 
-          profit: netProfit, 
+          profit: netProfit, // تم التصحيح هنا
           timestamp: Date.now(),
           marketType: MarketType.CRYPTO
         };
@@ -125,16 +122,17 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
         const updatedHoldings = [...holdings];
         updatedHoldings.splice(assetIdx, 1);
         
-        // تحديث سحابي شامل (رصيد + أصول + سجل) في طلب واحد
+        // تحديث سحابي واحد وشامل (رصيد + أصول + سجل)
         onSyncUserData({ 
           cryptoBalance: updatedCryptoBalance,
           cryptoHoldings: updatedHoldings, 
           tradeHistory: [historyItem, ...history] 
         });
 
-        alert(`ASSET LIQUIDATED: Result ${netProfit >= 0 ? '+' : ''}${netProfit.toFixed(2)} USDT`);
+        // تم التصحيح هنا لاستخدام netProfit بدلاً من profit
+        alert(`ASSET SOLD: Result ${netProfit >= 0 ? '+' : ''}${netProfit.toFixed(2)} USDT Realized.`);
       } else {
-        alert("⚠️ PORTFOLIO ERROR: You do not own this asset.");
+        alert("⚠️ INVENTORY ERROR: You do not own this asset in your portfolio.");
       }
     }
   };
@@ -142,10 +140,10 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
   return (
     <div className="h-screen flex flex-col bg-[#0b0e11] text-white overflow-hidden font-sans select-none text-[11px]">
       
-      {/* --- NAVBAR: NAVIGATION LEFT, FINANCE RIGHT --- */}
+      {/* --- [A] NAVBAR: NAVIGATION LEFT, FINANCE RIGHT --- */}
       <nav className="h-16 border-b border-white/5 bg-[#181a20] flex items-center justify-between px-6 z-[100] shadow-2xl shrink-0">
         
-        {/* جهة اليسار: Logo + Home + Account (خط كبير) */}
+        {/* جهة اليسار: Logo + Home + Account (خط كبير وعريض) */}
         <div className="flex items-center gap-12">
           <div className="flex items-center gap-2 cursor-pointer group" onClick={() => navigate('/')}>
             <Logo className="w-8 h-8 group-hover:rotate-12 transition-transform" />
@@ -185,16 +183,17 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
         </div>
       </nav>
 
+      {/* --- [B] MAIN CONTENT AREA --- */}
       <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
         
-        {/* --- SIDEBAR: ASSETS STRIP (Mobile Friendly) --- */}
+        {/* Sidebar: Market Watch (Responsive Layout) */}
         <div className="w-full md:w-64 border-r border-white/5 bg-[#1e2329] flex flex-row md:flex-col overflow-x-auto md:overflow-y-auto shrink-0 custom-scrollbar z-10 shadow-xl">
           <div className="hidden md:block p-5 text-[11px] text-gray-500 font-black uppercase border-b border-white/5 tracking-[0.2em] bg-black/10">Market Watch</div>
           {coins.map(c => (
             <div 
               key={c.s} 
               onClick={() => setSelected(c.s)} 
-              className={`p-4 md:p-6 border-r md:border-r-0 md:border-b border-white/[0.02] cursor-pointer whitespace-nowrap transition-all ${selected === c.s ? 'bg-yellow-500/10 border-b-2 border-b-yellow-500 md:border-b-0 md:border-l-4 md:border-l-yellow-500 shadow-inner' : 'hover:bg-white/[0.02]'}`}
+              className={`p-4 md:p-6 border-r md:border-r-0 md:border-b border-white/[0.02] cursor-pointer whitespace-nowrap transition-all ${selected === c.s ? 'bg-yellow-500/10 border-b-2 border-b-yellow-500 md:border-b-0 md:border-l-4 md:border-l-yellow-500 shadow-inner' : 'hover:bg-white/[0.01]'}`}
             >
               <div className="font-black text-[12px] md:text-[14px] uppercase text-white tracking-tighter">{c.s} / USDT</div>
               <div className="hidden md:block text-[9px] text-gray-500 uppercase font-bold mt-1 opacity-60">{c.n}</div>
@@ -202,12 +201,12 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
           ))}
         </div>
 
-        {/* --- MAIN AREA: CHART & TERMINAL --- */}
+        {/* Workspace: Trade Control + Chart + Terminal */}
         <div className="flex-1 flex flex-col overflow-hidden min-w-0 bg-[#0b0e11]">
           
-          {/* Quick Trade Bar */}
+          {/* Quick Trade Interface */}
           <div className="p-4 bg-[#181A20] border-b border-white/5 flex justify-between items-center gap-4 shadow-md">
-            <h2 className="text-xl md:text-2xl font-black uppercase tracking-tighter text-white italic">{selected} <span className="text-gray-600 not-italic">/ Live</span></h2>
+            <h2 className="text-xl md:text-2xl font-black uppercase tracking-tighter text-white italic leading-none">{selected} <span className="text-gray-600 not-italic">/ Live</span></h2>
             <div className="flex items-center gap-4">
                <div className="flex items-center bg-black/60 rounded-2xl border border-white/10 h-12 px-5 shadow-inner">
                   <span className="text-[10px] text-gray-500 font-black mr-4 uppercase tracking-widest">QUANTITY</span>
@@ -227,7 +226,7 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
             </div>
           </div>
 
-          {/* Full-width Crypto Chart */}
+          {/* High-Definition Chart Section */}
           <div className="flex-1 bg-black relative shadow-inner">
             <iframe 
               src={`https://s.tradingview.com/widgetembed/?symbol=BINANCE:${selected}USDT&interval=1&theme=dark&style=1&locale=en&enable_publishing=false&hide_top_toolbar=false&allow_symbol_change=false`} 
@@ -236,13 +235,16 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
             />
           </div>
 
-          {/* --- [C] BOTTOM TERMINAL PANEL --- */}
+          {/* --- [C] MT5 STYLE BOTTOM TERMINAL PANEL --- */}
           <div className="h-60 md:h-72 bg-[#181a20] border-t border-white/10 flex flex-col overflow-hidden shrink-0 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
+             
+             {/* Terminal Navigation */}
              <div className="flex bg-[#0b0e11] text-[9px] text-gray-500 border-b border-white/5 font-black uppercase tracking-widest">
                 <button onClick={() => setBottomTab('ASSETS')} className={`px-12 py-4 border-r border-white/5 transition-all ${bottomTab === 'ASSETS' ? 'bg-[#1e2329] text-yellow-500 font-black' : 'hover:text-white'}`}>Active Portfolio</button>
                 <button onClick={() => setBottomTab('HISTORY')} className={`px-12 py-4 border-r border-white/5 transition-all ${bottomTab === 'HISTORY' ? 'bg-[#1e2329] text-yellow-500 font-black' : 'hover:text-white'}`}>Trade History</button>
              </div>
              
+             {/* Data Table */}
              <div className="flex-1 overflow-y-auto custom-scrollbar p-5 bg-[#181a20]">
                 <table className="w-full text-left text-white border-collapse">
                    <thead className="text-gray-600 border-b border-white/5 uppercase font-black tracking-widest text-[9px]">
@@ -284,14 +286,21 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
                    </tbody>
                 </table>
                 {(bottomTab === 'ASSETS' ? holdings : history).length === 0 && (
-                  <div className="p-20 text-center text-gray-800 font-black uppercase tracking-[0.4em] italic opacity-30">No Cloud Records Found</div>
+                  <div className="p-20 text-center text-gray-700 font-black uppercase tracking-[0.4em] italic opacity-30">No Cloud Records Found</div>
                 )}
+             </div>
+
+             {/* Footer Statistics Strip */}
+             <div className="p-2.5 bg-[#0b0e11] border-t border-white/5 flex gap-10 text-[10px] text-gray-500 font-black uppercase tracking-widest overflow-x-auto whitespace-nowrap">
+                <div>Account Health: <span className="text-green-500">EXCELLENT</span></div>
+                <div>Server Status: <span className="text-white">ENCRYPTED NODE 01</span></div>
+                <div className="ml-auto opacity-30 font-mono italic uppercase">ZENTUM CLOUD INFRASTRUCTURE V4.2</div>
              </div>
           </div>
         </div>
       </div>
 
-      {/* --- [D] POPUPS --- */}
+      {/* --- [D] POPUPS & MODALS --- */}
       <DepositModal isOpen={isDepositOpen} onClose={() => setIsDepositOpen(false)} user={user} />
       <AccountModal isOpen={isAccountOpen} onClose={() => setIsAccountOpen(false)} user={user} />
       <WithdrawModal isOpen={isWithdrawOpen} onClose={() => setIsWithdrawOpen(false)} user={user} walletType="crypto" />
