@@ -8,7 +8,7 @@ import WithdrawModal from '../components/WithdrawModal';
 import { User, CryptoHolding, HistoryOrder, MarketType } from '../types';
 
 /**
- * ZENTUM CRYPTO EXCHANGE - PROFESSIONAL ULTIMATE EDITION (V4.2)
+ * ZENTUM CRYPTO EXCHANGE - PROFESSIONAL ULTIMATE EDITION (V4.8)
  * -----------------------------------------------------------
  * DEVELOPED BY: ZENTUM GLOBAL CORE
  * FEATURES:
@@ -28,7 +28,7 @@ interface CryptoProps {
 const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUserData, onLogout }) => {
   const navigate = useNavigate();
 
-  // --- [1] حالات الصفحة الأساسية (States) ---
+  // --- [1] حالات الصفحة الأساسية (States) - كاملة بدون اختصار ---
   const [selected, setSelected] = useState('BTC');
   const [volume, setVolume] = useState(0.01); 
   const [livePrices, setLivePrices] = useState<any>({});
@@ -41,7 +41,7 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
   // حالات التيرمينال السفلي
   const [bottomTab, setBottomTab] = useState<'ASSETS' | 'HISTORY'>('ASSETS');
 
-  // جلب البيانات السحابية من كائن المستخدم المحدث لحظياً عبر Props
+  // جلب البيانات السحابية الحقيقية من كائن المستخدم المحدث لحظياً عبر Props
   const holdings = user.cryptoHoldings || [];
   const history = user.tradeHistory || [];
 
@@ -88,7 +88,7 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
         buyPrice: price 
       };
 
-      // إرسال تحديث سحابي واحد (Atomic Update)
+      // إرسال تحديث سحابي واحد (رصيد + محفظة)
       onSyncUserData({ 
         cryptoBalance: updatedCryptoBalance,
         cryptoHoldings: [...holdings, newHolding] 
@@ -106,7 +106,7 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
 
         const updatedCryptoBalance = user.cryptoBalance + gain;
 
-        // إعداد سجل التاريخ (تصحيح مسمى profit)
+        // إعداد سجل التاريخ
         const historyItem: HistoryOrder = {
           id: Date.now(), 
           symbol: asset.symbol, 
@@ -114,7 +114,7 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
           openPrice: asset.buyPrice,
           closePrice: price, 
           volume: asset.qty, 
-          profit: netProfit, // تم التصحيح هنا
+          profit: netProfit, 
           timestamp: Date.now(),
           marketType: MarketType.CRYPTO
         };
@@ -129,7 +129,6 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
           tradeHistory: [historyItem, ...history] 
         });
 
-        // تم التصحيح هنا لاستخدام netProfit بدلاً من profit
         alert(`ASSET SOLD: Result ${netProfit >= 0 ? '+' : ''}${netProfit.toFixed(2)} USDT Realized.`);
       } else {
         alert("⚠️ INVENTORY ERROR: You do not own this asset in your portfolio.");
@@ -140,22 +139,22 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
   return (
     <div className="h-screen flex flex-col bg-[#0b0e11] text-white overflow-hidden font-sans select-none text-[11px]">
       
-      {/* --- [A] NAVBAR: NAVIGATION LEFT, FINANCE RIGHT --- */}
-      <nav className="h-16 border-b border-white/5 bg-[#181a20] flex items-center justify-between px-6 z-[100] shadow-2xl shrink-0">
+      {/* --- [A] NAVBAR: TOP NAVIGATION & FINANCE --- */}
+      <nav className="h-16 border-b border-white/5 bg-[#181a20] flex items-center justify-between px-3 sm:px-6 z-[100] shadow-2xl shrink-0">
         
         {/* جهة اليسار: Logo + Home + Account (خط كبير وعريض) */}
-        <div className="flex items-center gap-12">
+        <div className="flex items-center gap-4 sm:gap-12">
           <div className="flex items-center gap-2 cursor-pointer group" onClick={() => navigate('/')}>
-            <Logo className="w-8 h-8 group-hover:rotate-12 transition-transform" />
-            <span className="font-black text-yellow-500 uppercase text-sm tracking-[0.2em] italic">ZENTUM</span>
+            <Logo className="w-8 h-8 sm:w-10 sm:h-10 group-hover:rotate-12 transition-transform" />
+            <span className="font-black text-white uppercase text-xs sm:text-lg tracking-tighter italic">ZENTUM</span>
           </div>
           
-          <div className="flex items-center gap-10">
-            <button onClick={() => navigate('/')} className="text-gray-400 hover:text-white transition-all uppercase font-black text-[13px] tracking-widest flex items-center gap-2.5">
-              <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          <div className="flex items-center gap-3 sm:gap-8">
+            <button onClick={() => navigate('/')} className="text-gray-400 hover:text-white transition-all uppercase font-black text-[11px] sm:text-[13px] tracking-widest flex items-center gap-2">
+              <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" strokeLinecap="round" strokeLinejoin="round"/></svg>
               Home
             </button>
-            <button onClick={() => setIsAccountOpen(true)} className="text-gray-400 hover:text-white transition-all uppercase font-black text-[13px] tracking-widest flex items-center gap-2.5">
+            <button onClick={() => setIsAccountOpen(true)} className="text-gray-400 hover:text-white transition-all uppercase font-black text-[11px] sm:text-[13px] tracking-widest flex items-center gap-2">
               <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" strokeLinecap="round" strokeLinejoin="round"/></svg>
               Account
             </button>
@@ -163,30 +162,29 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
         </div>
         
         {/* جهة اليمين: المالية والتحكم */}
-        <div className="flex items-center gap-6">
-          <div className="flex flex-col items-end mr-6 text-right">
-            <span className="text-[9px] text-gray-600 uppercase font-black tracking-widest leading-none mb-1">AVAILABLE BALANCE</span>
-            <span className="text-[16px] font-mono font-black text-yellow-500 tracking-tighter shadow-sm">
+        <div className="flex items-center gap-2 sm:gap-5">
+          <div className="flex flex-col items-end mr-2 sm:mr-4 text-right">
+            <span className="text-[7px] sm:text-[9px] text-gray-600 uppercase font-black tracking-widest leading-none mb-1">AVAILABLE BALANCE</span>
+            <span className="text-[11px] sm:text-[16px] font-mono font-black text-yellow-500 tracking-tighter">
               {user.cryptoBalance.toLocaleString(undefined, {minimumFractionDigits: 2})} 
-              <span className="text-[10px] text-gray-400 ml-1 uppercase">USDT</span>
+              <span className="text-[8px] text-gray-400 ml-1 uppercase">USDT</span>
             </span>
           </div>
 
-          <div className="flex items-center gap-2.5">
-            <button onClick={() => setIsDepositOpen(true)} className="bg-yellow-600 text-black px-7 py-3 rounded-2xl font-black text-[12px] uppercase shadow-lg shadow-yellow-900/30 hover:bg-yellow-500 transition-all active:scale-95">Deposit</button>
-            <button onClick={() => setIsWithdrawOpen(true)} className="border border-white/20 text-white px-7 py-3 rounded-2xl font-black text-[12px] uppercase hover:bg-white/10 active:scale-95 transition-all">Withdraw</button>
+          <div className="flex items-center gap-1 sm:gap-2.5">
+            <button onClick={() => setIsDepositOpen(true)} className="bg-yellow-600 text-black px-3 sm:px-7 py-1.5 sm:py-3 rounded-xl font-black text-[9px] sm:text-[12px] uppercase shadow-lg shadow-yellow-900/30 hover:bg-yellow-500 transition-all active:scale-95">Deposit</button>
+            <button onClick={() => setIsWithdrawOpen(true)} className="border border-white/20 text-white px-3 sm:px-7 py-1.5 sm:py-3 rounded-xl font-black text-[9px] sm:text-[12px] uppercase hover:bg-white/10 active:scale-95 transition-all">Withdraw</button>
           </div>
           
-          <button onClick={onLogout} className="text-gray-500 hover:text-red-500 transition-colors ml-3 p-2">
-            <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          <button onClick={onLogout} className="text-gray-500 hover:text-red-500 transition-colors ml-1 sm:ml-3 p-1">
+            <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </button>
         </div>
       </nav>
 
-      {/* --- [B] MAIN CONTENT AREA --- */}
       <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
         
-        {/* Sidebar: Market Watch (Responsive Layout) */}
+        {/* --- SIDEBAR: Market Watch (Mobile: Top Strip / Desktop: Sidebar) --- */}
         <div className="w-full md:w-64 border-r border-white/5 bg-[#1e2329] flex flex-row md:flex-col overflow-x-auto md:overflow-y-auto shrink-0 custom-scrollbar z-10 shadow-xl">
           <div className="hidden md:block p-5 text-[11px] text-gray-500 font-black uppercase border-b border-white/5 tracking-[0.2em] bg-black/10">Market Watch</div>
           {coins.map(c => (
@@ -201,27 +199,31 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
           ))}
         </div>
 
-        {/* Workspace: Trade Control + Chart + Terminal */}
+        {/* --- MAIN AREA: CHART & TERMINAL --- */}
         <div className="flex-1 flex flex-col overflow-hidden min-w-0 bg-[#0b0e11]">
           
           {/* Quick Trade Interface */}
-          <div className="p-4 bg-[#181A20] border-b border-white/5 flex justify-between items-center gap-4 shadow-md">
-            <h2 className="text-xl md:text-2xl font-black uppercase tracking-tighter text-white italic leading-none">{selected} <span className="text-gray-600 not-italic">/ Live</span></h2>
-            <div className="flex items-center gap-4">
-               <div className="flex items-center bg-black/60 rounded-2xl border border-white/10 h-12 px-5 shadow-inner">
-                  <span className="text-[10px] text-gray-500 font-black mr-4 uppercase tracking-widest">QUANTITY</span>
+          <div className="p-3 md:p-4 bg-[#181A20] border-b border-white/5 flex justify-between items-center gap-2 md:gap-4 shadow-md">
+            <div className="flex flex-col">
+              <h2 className="text-lg md:text-2xl font-black uppercase tracking-tighter text-white italic leading-none">{selected} <span className="text-gray-600 not-italic">/ Live</span></h2>
+              <span className="text-[7px] md:text-[9px] text-yellow-500 font-black tracking-widest uppercase mt-1">Blockchain Execution Active</span>
+            </div>
+
+            <div className="flex items-center gap-2 md:gap-4">
+               <div className="flex items-center bg-black/60 rounded-2xl border border-white/10 h-10 md:h-12 px-3 md:px-5 shadow-inner">
+                  <span className="hidden xs:inline text-[8px] md:text-[10px] text-gray-500 font-black mr-2 md:mr-4 uppercase tracking-widest">QUANTITY</span>
                   <input 
                     type="number" 
                     value={volume} 
                     onChange={e => setVolume(parseFloat(e.target.value))} 
-                    className="w-16 md:w-28 bg-transparent border-none text-white text-[15px] font-black outline-none font-mono text-center" 
+                    className="w-12 md:w-28 bg-transparent border-none text-white text-[12px] md:text-[15px] font-black outline-none font-mono text-center" 
                     step="0.01" 
                     min="0.01" 
                   />
                </div>
-               <div className="flex bg-[#1e2329] border border-white/10 rounded-2xl h-12 overflow-hidden shadow-2xl">
-                  <button onClick={() => handleTrade('SELL')} className="px-10 md:px-16 bg-red-600/20 text-red-500 border-r border-white/5 font-black uppercase text-[13px] hover:bg-red-600 hover:text-white transition-all tracking-widest active:scale-95">Sell</button>
-                  <button onClick={() => handleTrade('BUY')} className="px-10 md:px-16 bg-[#02c076]/20 text-[#02c076] font-black uppercase text-[13px] hover:bg-[#02c076] hover:text-white transition-all tracking-widest active:scale-95">Buy</button>
+               <div className="flex bg-[#1e2329] border border-white/10 rounded-2xl h-10 md:h-12 overflow-hidden shadow-2xl">
+                  <button onClick={() => handleTrade('SELL')} className="px-6 md:px-16 bg-red-600/20 text-red-500 border-r border-white/5 font-black text-[11px] md:text-[13px] uppercase hover:bg-red-600 hover:text-white transition-all tracking-widest active:scale-95">Sell</button>
+                  <button onClick={() => handleTrade('BUY')} className="px-6 md:px-16 bg-[#02c076]/20 text-[#02c076] font-black text-[11px] md:text-[13px] uppercase hover:bg-[#02c076] hover:text-white transition-all tracking-widest active:scale-95">Buy</button>
                </div>
             </div>
           </div>
@@ -236,23 +238,23 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
           </div>
 
           {/* --- [C] MT5 STYLE BOTTOM TERMINAL PANEL --- */}
-          <div className="h-60 md:h-72 bg-[#181a20] border-t border-white/10 flex flex-col overflow-hidden shrink-0 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
+          <div className="h-56 md:h-72 bg-[#181a20] border-t border-white/10 flex flex-col overflow-hidden shrink-0 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
              
              {/* Terminal Navigation */}
              <div className="flex bg-[#0b0e11] text-[9px] text-gray-500 border-b border-white/5 font-black uppercase tracking-widest">
-                <button onClick={() => setBottomTab('ASSETS')} className={`px-12 py-4 border-r border-white/5 transition-all ${bottomTab === 'ASSETS' ? 'bg-[#1e2329] text-yellow-500 font-black' : 'hover:text-white'}`}>Active Portfolio</button>
-                <button onClick={() => setBottomTab('HISTORY')} className={`px-12 py-4 border-r border-white/5 transition-all ${bottomTab === 'HISTORY' ? 'bg-[#1e2329] text-yellow-500 font-black' : 'hover:text-white'}`}>Trade History</button>
+                <button onClick={() => setBottomTab('ASSETS')} className={`px-10 py-3 md:px-12 md:py-4 border-r border-white/5 transition-all ${bottomTab === 'ASSETS' ? 'bg-[#1e2329] text-yellow-500 font-black' : 'hover:text-white'}`}>Active Portfolio</button>
+                <button onClick={() => setBottomTab('HISTORY')} className={`px-10 py-3 md:px-12 md:py-4 border-r border-white/5 transition-all ${bottomTab === 'HISTORY' ? 'bg-[#1e2329] text-yellow-500 font-black' : 'hover:text-white'}`}>Trade History</button>
              </div>
              
-             {/* Data Table */}
-             <div className="flex-1 overflow-y-auto custom-scrollbar p-5 bg-[#181a20]">
+             {/* Data Table Area */}
+             <div className="flex-1 overflow-y-auto custom-scrollbar p-3 md:p-5 bg-[#181a20]">
                 <table className="w-full text-left text-white border-collapse">
-                   <thead className="text-gray-600 border-b border-white/5 uppercase font-black tracking-widest text-[9px]">
+                   <thead className="text-gray-600 border-b border-white/5 uppercase font-black tracking-widest text-[8px] md:text-[9px]">
                      <tr>
-                        <th className="pb-4 pr-4">Identity</th>
-                        <th className="pb-4 pr-4 text-center">Volume</th>
-                        <th className="pb-4 pr-4 text-center">Entry Price</th>
-                        <th className="text-right pb-4">{bottomTab === 'ASSETS' ? 'Current P/L' : 'Closed Result'}</th>
+                        <th className="pb-3 md:pb-4 pr-2 md:pr-4">Identity</th>
+                        <th className="pb-3 md:pb-4 pr-2 md:pr-4 text-center">Volume</th>
+                        <th className="pb-3 md:pb-4 pr-2 md:pr-4 text-center hidden sm:table-cell">Entry Price</th>
+                        <th className="text-right pb-3 md:pb-4">{bottomTab === 'ASSETS' ? 'Floating P/L' : 'Closed Result'}</th>
                      </tr>
                    </thead>
                    <tbody className="divide-y divide-white/[0.03]">
@@ -262,11 +264,11 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
                          const pl = currentVal - (h.qty * h.buyPrice);
                          return (
                            <tr key={h.id} className="hover:bg-white/[0.01] transition-colors group">
-                             <td className="py-5 font-black text-white uppercase text-xs tracking-tighter">{h.symbol} / USDT</td>
-                             <td className="py-5 text-center font-mono font-black text-gray-300 text-sm">{h.qty.toFixed(4)}</td>
-                             <td className="py-5 text-center text-gray-500 font-mono italic">${h.buyPrice.toLocaleString()}</td>
-                             <td className={`text-right py-5 font-black font-mono text-base ${pl >= 0 ? 'text-[#02c076]' : 'text-[#f6465d]'}`}>
-                               {pl >= 0 ? '+' : ''}{pl.toFixed(2)} <span className="text-[10px] opacity-50">USDT</span>
+                             <td className="py-4 md:py-5 font-black text-white uppercase text-[10px] md:text-xs tracking-tighter">{h.symbol} / USDT</td>
+                             <td className="py-4 md:py-5 text-center font-mono font-black text-gray-300 text-xs md:text-sm">{h.qty.toFixed(4)}</td>
+                             <td className="py-4 md:py-5 text-center text-gray-500 font-mono italic text-[10px] md:text-xs hidden sm:table-cell">${h.buyPrice.toLocaleString()}</td>
+                             <td className={`text-right py-4 md:py-5 font-black font-mono text-[13px] md:text-base ${pl >= 0 ? 'text-[#02c076]' : 'text-[#f6465d]'}`}>
+                               {pl >= 0 ? '+' : ''}{pl.toFixed(2)} <span className="text-[9px] opacity-50 hidden md:inline">USDT</span>
                              </td>
                            </tr>
                          );
@@ -274,10 +276,10 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
                      ) : (
                        history.filter(h => h.marketType === MarketType.CRYPTO).map((h: any) => (
                          <tr key={h.id} className="border-b border-white/[0.02] opacity-60">
-                           <td className="py-5 font-black text-white uppercase text-xs">{h.symbol} / USDT</td>
-                           <td className="py-5 text-center font-mono text-sm">{h.volume.toFixed(4)}</td>
-                           <td className="py-5 text-center text-gray-500 font-mono italic">${h.openPrice.toLocaleString()}</td>
-                           <td className={`text-right py-5 font-black font-mono text-base ${h.profit >= 0 ? 'text-[#02c076]' : 'text-[#f6465d]'}`}>
+                           <td className="py-4 md:py-5 font-black text-white uppercase text-[10px] md:text-xs">{h.symbol} / USDT</td>
+                           <td className="py-4 md:py-5 text-center font-mono text-xs md:text-sm">{h.volume.toFixed(4)}</td>
+                           <td className="py-4 md:py-5 text-center text-gray-500 font-mono italic text-[10px] md:text-xs hidden sm:table-cell">${h.openPrice.toLocaleString()}</td>
+                           <td className={`text-right py-4 md:py-5 font-black font-mono text-[13px] md:text-base ${h.profit >= 0 ? 'text-[#02c076]' : 'text-[#f6465d]'}`}>
                              {h.profit >= 0 ? '+' : ''}{h.profit.toFixed(2)}
                            </td>
                          </tr>
@@ -286,15 +288,15 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
                    </tbody>
                 </table>
                 {(bottomTab === 'ASSETS' ? holdings : history).length === 0 && (
-                  <div className="p-20 text-center text-gray-700 font-black uppercase tracking-[0.4em] italic opacity-30">No Cloud Records Found</div>
+                  <div className="p-16 text-center text-gray-800 font-black uppercase tracking-[0.3em] italic opacity-30">No Cloud Database Records Found</div>
                 )}
              </div>
 
              {/* Footer Statistics Strip */}
-             <div className="p-2.5 bg-[#0b0e11] border-t border-white/5 flex gap-10 text-[10px] text-gray-500 font-black uppercase tracking-widest overflow-x-auto whitespace-nowrap">
-                <div>Account Health: <span className="text-green-500">EXCELLENT</span></div>
-                <div>Server Status: <span className="text-white">ENCRYPTED NODE 01</span></div>
-                <div className="ml-auto opacity-30 font-mono italic uppercase">ZENTUM CLOUD INFRASTRUCTURE V4.2</div>
+             <div className="p-2 md:p-2.5 bg-[#0b0e11] border-t border-white/5 flex gap-10 text-[9px] text-gray-500 font-black uppercase tracking-widest overflow-x-auto whitespace-nowrap">
+                <div>Account Status: <span className="text-green-500">EXCELLENT</span></div>
+                <div className="hidden md:block">Node Connection: <span className="text-white">ENCRYPTED 01</span></div>
+                <div className="ml-auto opacity-30 font-mono italic uppercase">ZENTUM GLOBAL CLOUD V4.8</div>
              </div>
           </div>
         </div>

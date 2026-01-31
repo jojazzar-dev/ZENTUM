@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Logo } from '../constants';
+import Logo from '../components/Logo'; 
 import { fetchFXPrices } from '../services/marketService';
 import DepositModal from '../components/DepositModal';
 import AccountModal from '../components/AccountModal';
@@ -8,15 +8,14 @@ import WithdrawModal from '../components/WithdrawModal';
 import { User, ForexOrder, HistoryOrder, MarketType } from '../types';
 
 /**
- * ZENTUM FOREX TERMINAL - PROFESSIONAL ULTIMATE EDITION (V4.0)
+ * ZENTUM FOREX TERMINAL - ULTIMATE MOBILE-RESPONSIVE EDITION (V4.8)
  * ----------------------------------------------------------------
- * DEVELOPED BY: ZENTUM GLOBAL CORE
  * FEATURES: 
  * - Full Dynamic Lot Calculation (Multiplier: 100,000)
  * - Precise 1:5000 Leverage Implementation ($20 Required per 1.0 Lot)
  * - Atomic Cloud Sync (Preventing Balance Race Conditions)
  * - Comprehensive MT5 Style Toolbox & History Logs
- * - Mobile Portrait Compatibility (Horizontal Scrolling Sidebar)
+ * - Optimized Portrait Layout (Horizontal Markets Strip)
  * ----------------------------------------------------------------
  */
 
@@ -30,9 +29,9 @@ interface ForexProps {
 const ForexTrader: React.FC<ForexProps> = ({ user, onUpdateBalance, onSyncUserData, onLogout }) => {
   const navigate = useNavigate();
 
-  // --- [1] حالات الصفحة الأساسية (Detailed States) ---
+  // --- [1] حالات الصفحة (States) - كاملة بدون اختصار ---
   const [selected, setSelected] = useState('EURUSD');
-  const [volume, setVolume] = useState(0.10); // Default Lot size
+  const [volume, setVolume] = useState(0.10); // حجم اللوت الافتراضي
   const [fxRates, setFxRates] = useState<any>({});
   
   // حالات التحكم في النوافذ المنبثقة (Modals)
@@ -54,11 +53,10 @@ const ForexTrader: React.FC<ForexProps> = ({ user, onUpdateBalance, onSyncUserDa
     'CADJPY', 'CHFJPY', 'NZDJPY', 'GBPCAD', 'AUDCAD', 'XAUUSD', 'XAGUSD',
     'US30', 'NAS100', 'DAX40', 'SPX500', 'USOIL', 'UKOIL', 'BTCUSD', 'ETHUSD',
     'SOLUSD', 'XRPUSD', 'DOTUSD', 'AVAXUSD', 'DOGEUSD', 'BNBUSD', 'LINKUSD',
-    'ADAUSD', 'MATICUSD', 'LTCUSD', 'BCHUSD', 'XLMUSD', 'ATOMUSD', 'UNIUSD',
-    'NEARUSD', 'APTUSD', 'OPUSD', 'ARBUSD', 'SUIUSD', 'SEIUSD', 'PEPEUSD'
+    'ADAUSD', 'MATICUSD', 'LTCUSD', 'BCHUSD', 'XLMUSD', 'ATOMUSD', 'UNIUSD'
   ];
 
-  // --- [2] محرك الأسعار اللحظية (Real-time Calculation Engine) ---
+  // --- [2] محرك الأسعار اللحظية (Live Price Engine) ---
   function getLivePrice(sym: string) {
     if (!fxRates || Object.keys(fxRates).length === 0) return 1.00000;
     
@@ -75,8 +73,8 @@ const ForexTrader: React.FC<ForexProps> = ({ user, onUpdateBalance, onSyncUserDa
     else price = (fxRates[target] || 1) / (fxRates[base] || 1);
     
     // إضافة تذبذب طفيف جداً للمطابقة مع حركة الشارت السريعة
-    const microTick = (Math.random() - 0.5) * 0.0001;
-    return price + microTick; 
+    const flicker = (Math.random() - 0.5) * 0.0001;
+    return price + flicker; 
   }
 
   // --- [3] المحرك المالي الاحترافي (الرافعة المالية 5000 واللوت المتغير) ---
@@ -88,7 +86,6 @@ const ForexTrader: React.FC<ForexProps> = ({ user, onUpdateBalance, onSyncUserDa
     const isSmallContract = o.symbol.includes('JPY') || o.symbol.includes('XAU') || (o.symbol.includes('USD') && o.symbol.length > 6);
     const contractSize = isSmallContract ? 1000 : 100000;
     
-    // الربح = (فرق السعر) * (الفوليوم المختار عند الفتح) * (حجم العقد)
     return diff * o.volume * contractSize;
   };
 
@@ -167,111 +164,107 @@ const ForexTrader: React.FC<ForexProps> = ({ user, onUpdateBalance, onSyncUserDa
   return (
     <div className="h-screen flex flex-col bg-[#0b0e11] text-[#d1d4dc] text-[11px] overflow-hidden font-sans select-none">
       
-      {/* --- [A] NAVBAR: NAVIGATION & FINANCE --- */}
-      <nav className="h-16 border-b border-white/5 bg-[#181a20] flex items-center justify-between px-4 z-[100] shadow-2xl shrink-0">
+      {/* --- [A] NAVBAR: TOP NAVIGATION & FINANCE --- */}
+      <nav className="h-16 border-b border-white/5 bg-[#181a20] flex items-center justify-between px-3 sm:px-6 z-[100] shadow-2xl shrink-0">
         
         {/* جهة اليسار: Logo + Home + Account (خط كبير وعريض) */}
-        <div className="flex items-center gap-12">
+        <div className="flex items-center gap-4 sm:gap-12">
           <div className="flex items-center gap-2 cursor-pointer group" onClick={() => navigate('/')}>
-            <Logo className="w-8 h-8 group-hover:rotate-12 transition-transform" />
-            <span className="font-black text-white uppercase text-sm tracking-[0.2em] italic">ZENTUM</span>
+            <Logo className="w-8 h-8 sm:w-10 sm:h-10 group-hover:rotate-12 transition-transform" />
+            <span className="font-black text-white uppercase text-xs sm:text-lg tracking-tighter italic">ZENTUM</span>
           </div>
           
-          <div className="flex items-center gap-10">
-            <button onClick={() => navigate('/')} className="text-gray-400 hover:text-white transition-all uppercase font-black text-[13px] tracking-widest flex items-center gap-2.5">
-              <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          <div className="flex items-center gap-3 sm:gap-8">
+            <button onClick={() => navigate('/')} className="text-gray-400 hover:text-white transition-all uppercase font-black text-[11px] sm:text-[13px] tracking-widest flex items-center gap-2">
+              <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" strokeLinecap="round" strokeLinejoin="round"/></svg>
               Home
             </button>
-            <button onClick={() => setIsAccountOpen(true)} className="text-gray-400 hover:text-white transition-all uppercase font-black text-[13px] tracking-widest flex items-center gap-2.5">
-              <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            <button onClick={() => setIsAccountOpen(true)} className="text-gray-400 hover:text-white transition-all uppercase font-black text-[11px] sm:text-[13px] tracking-widest flex items-center gap-2">
+              <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" strokeLinecap="round" strokeLinejoin="round"/></svg>
               Account
             </button>
           </div>
         </div>
 
         {/* جهة اليمين: المالية والتحكم */}
-        <div className="flex gap-4 sm:gap-6 items-center">
-           <div className="bg-black/40 px-3 py-1.5 rounded-2xl border border-white/5 font-bold uppercase flex items-center gap-4 shadow-inner">
-              <div className="flex flex-col items-end border-r border-white/10 pr-4">
-                <span className="text-gray-600 text-[8px] tracking-widest font-black uppercase">Equity</span>
-                <span className={`font-mono text-[14px] font-black ${totalPL >= 0 ? 'text-green-500' : 'text-red-500'}`}>${equity.toFixed(2)}</span>
+        <div className="flex gap-2 sm:gap-4 items-center">
+           <div className="bg-black/40 px-3 py-1.5 rounded-xl border border-white/5 font-bold uppercase text-[9px] sm:text-[10px] flex items-center gap-2 sm:gap-4 shadow-inner">
+              <div className="flex flex-col items-end border-r border-white/10 pr-2 sm:pr-4">
+                <span className="text-gray-600 text-[7px] sm:text-[8px] tracking-widest font-black">EQUITY</span>
+                <span className={`font-mono text-[11px] sm:text-[14px] font-black ${totalPL >= 0 ? 'text-green-500' : 'text-red-500'}`}>${equity.toFixed(2)}</span>
               </div>
               <div className="flex flex-col items-end">
-                <span className="text-gray-600 text-[8px] tracking-widest font-black uppercase">Balance</span>
-                <span className="text-white font-mono text-[14px] font-black">${user.forexBalance.toFixed(2)}</span>
+                <span className="text-gray-600 text-[7px] sm:text-[8px] tracking-widest font-black">BALANCE</span>
+                <span className="text-white font-mono text-[11px] sm:text-[14px] font-black">${user.forexBalance.toFixed(2)}</span>
               </div>
            </div>
            
-           <div className="flex gap-2">
-             <button onClick={() => setIsDepositOpen(true)} className="bg-blue-600 text-white px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl font-black text-[10px] sm:text-[11px] uppercase shadow-lg shadow-blue-900/40 hover:bg-blue-500 transition-all active:scale-95">Add</button>
-             <button onClick={() => setIsWithdrawOpen(true)} className="border border-white/20 text-white px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl font-black text-[10px] sm:text-[11px] uppercase hover:bg-white/10 active:scale-95 transition-all">Withdraw</button>
+           <div className="flex gap-1 sm:gap-2">
+             <button onClick={() => setIsDepositOpen(true)} className="bg-blue-600 text-white px-3 sm:px-6 py-1.5 sm:py-2.5 rounded-xl font-black text-[9px] sm:text-[11px] uppercase shadow-lg shadow-blue-900/40 hover:bg-blue-500 transition-all">Add</button>
+             <button onClick={() => setIsWithdrawOpen(true)} className="border border-white/20 text-white px-3 sm:px-6 py-1.5 sm:py-2.5 rounded-xl font-black text-[9px] sm:text-[11px] uppercase hover:bg-white/10 transition-all">Withdraw</button>
            </div>
 
-           <button onClick={onLogout} className="text-gray-500 hover:text-red-500 ml-2 p-2 transition-colors">
-             <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" strokeLinecap="round" strokeLinejoin="round"/></svg>
+           <button onClick={onLogout} className="text-gray-500 hover:text-red-500 ml-1 p-1 transition-colors">
+             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" strokeLinecap="round" strokeLinejoin="round"/></svg>
            </button>
         </div>
       </nav>
 
-      {/* --- [B] MAIN WORKSPACE: OPTIMIZED FOR MOBILE PORTRAIT --- */}
       <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
         
-        {/* Sidebar: Markets Strip (Mobile: Horizontal Scroll / Desktop: Vertical List) */}
+        {/* --- SIDEBAR: Market Watch (Mobile: Top Strip / Desktop: Sidebar) --- */}
         <div className="w-full md:w-64 border-r border-[#2b2f36] bg-[#1e2329] flex flex-row md:flex-col overflow-x-auto md:overflow-y-auto shrink-0 custom-scrollbar z-10 shadow-xl">
-          <div className="hidden md:block p-4 text-[10px] text-gray-500 font-black uppercase border-b border-white/5 tracking-[0.2em] bg-black/10">Market Stream</div>
+          <div className="hidden md:block p-4 text-[10px] text-gray-500 font-black uppercase border-b border-white/5 tracking-[0.2em] bg-black/10">Market Watch</div>
           {pairs.map(s => (
             <div 
               key={s} 
               onClick={() => setSelected(s)} 
               className={`p-4 md:p-5 border-r md:border-r-0 md:border-b border-white/[0.02] cursor-pointer whitespace-nowrap transition-all ${selected === s ? 'bg-blue-600/10 border-b-2 border-b-blue-500 md:border-b-0 md:border-l-4 md:border-l-blue-500 shadow-inner' : 'hover:bg-white/[0.01]'}`}
             >
-              <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center">
-                <span className="font-black text-[12px] md:text-[14px] uppercase text-white tracking-tighter">{s}</span>
-                <span className="hidden md:inline text-blue-500 font-mono text-[10px] opacity-40">Forex Pair</span>
-              </div>
+              <span className="font-black text-[12px] md:text-[14px] uppercase text-white tracking-tighter">{s}</span>
             </div>
           ))}
         </div>
 
-        {/* Main Work Area: Trade Bar + Chart + Terminal */}
+        {/* --- MAIN WORK AREA --- */}
         <div className="flex-1 flex flex-col overflow-hidden min-w-0 bg-[#0b0e11]">
           
-          {/* Quick Execution Bar (RETAINED ALL MARKUP) */}
+          {/* Quick Trade Bar */}
           <div className="p-3 md:p-4 bg-[#181a20] border-b border-[#2b2f36] flex justify-between items-center gap-4 shadow-md">
             <div className="flex flex-col">
-              <h2 className="text-lg md:text-xl font-black uppercase tracking-tighter text-white italic leading-none">{selected}</h2>
-              <span className="text-[7px] md:text-[9px] text-blue-500 font-black tracking-widest uppercase mt-1">Cloud Execution Active</span>
+              <h2 className="text-sm md:text-xl font-black uppercase text-white italic leading-none">{selected}</h2>
+              <span className="text-[7px] md:text-[9px] text-blue-500 font-black tracking-widest uppercase mt-1">Cloud Sync Active</span>
             </div>
 
-            <div className="flex items-center gap-3">
-               <div className="flex items-center bg-black/50 rounded-xl border border-white/10 h-10 md:h-12 px-3 md:px-5 shadow-inner">
-                  <span className="text-[8px] md:text-[10px] text-gray-500 font-black mr-2 md:mr-4 uppercase tracking-widest">LOT SIZE</span>
+            <div className="flex items-center gap-2 sm:gap-3">
+               <div className="flex items-center bg-black/50 rounded-xl border border-white/10 h-10 md:h-12 px-2 md:px-5 shadow-inner">
+                  <span className="hidden xs:inline text-[8px] md:text-[10px] text-gray-500 font-black mr-2 uppercase tracking-widest">LOT SIZE</span>
                   <input 
                     type="number" 
                     value={volume} 
                     onChange={e => setVolume(parseFloat(e.target.value))} 
-                    className="w-12 md:w-24 bg-transparent border-none text-white text-xs md:text-[15px] font-black outline-none font-mono text-center" 
+                    className="w-12 md:w-24 bg-transparent border-none text-white text-[12px] md:text-[15px] font-black outline-none font-mono text-center" 
                     step="0.01" 
                     min="0.01" 
                   />
                </div>
                <div className="flex bg-[#1e2329] border border-[#2b2f36] rounded-xl h-10 md:h-12 overflow-hidden shadow-2xl">
-                  <button onClick={() => openOrder('SELL')} className="px-6 md:px-12 bg-red-600/20 text-red-500 border-r border-[#2b2f36] font-black text-[10px] md:text-[12px] uppercase hover:bg-red-600 hover:text-white transition-all tracking-widest active:scale-95">Sell</button>
-                  <button onClick={() => openOrder('BUY')} className="px-6 md:px-12 bg-blue-600/20 text-blue-500 font-black text-[10px] md:text-[12px] uppercase hover:bg-blue-600 hover:text-white transition-all tracking-widest active:scale-95">Buy</button>
+                  <button onClick={() => openOrder('SELL')} className="px-6 md:px-12 bg-red-600/20 text-red-500 border-r border-[#2b2f36] font-black text-[10px] md:text-[12px] uppercase hover:bg-red-600 hover:text-white transition-all">Sell</button>
+                  <button onClick={() => openOrder('BUY')} className="px-6 md:px-12 bg-blue-600/20 text-blue-500 font-black text-[10px] md:text-[12px] uppercase hover:bg-blue-600 hover:text-white transition-all">Buy</button>
                </div>
             </div>
           </div>
 
-          {/* Full Chart Section (PRESERVED) */}
+          {/* Interactive Chart Section */}
           <div className="flex-1 bg-black relative shadow-inner">
             <iframe 
               src={`https://s.tradingview.com/widgetembed/?symbol=${selected === 'XAUUSD' ? 'OANDA:XAUUSD' : selected === 'NAS100' ? 'CAPITALCOM:US100' : 'FX_IDC:' + selected}&interval=1&theme=dark&style=1&locale=en&enable_publishing=false&hide_top_toolbar=false&allow_symbol_change=false`} 
               className="w-full h-full border-none" 
-              title="Forex Terminal Chart"
+              title="Forex Live Feed"
             />
           </div>
 
-          {/* --- [C] MT5 BOTTOM TOOLBOX PANEL --- */}
+          {/* --- MT5 BOTTOM TERMINAL (Always Visible) --- */}
           <div className="h-56 md:h-64 bg-[#181a20] border-t border-[#2b2f36] flex flex-col overflow-hidden shrink-0 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
             
             {/* Tab Selector Buttons */}
@@ -280,16 +273,16 @@ const ForexTrader: React.FC<ForexProps> = ({ user, onUpdateBalance, onSyncUserDa
                <button onClick={() => setBottomTab('HISTORY')} className={`px-8 md:px-12 py-3 md:py-4 border-r border-[#2b2f36] transition-all ${bottomTab === 'HISTORY' ? 'bg-[#1e2329] text-blue-500 font-black' : 'hover:text-white'}`}>Account History</button>
             </div>
 
-            {/* Account Financial Strip (RETAINED ALL FIELDS) */}
+            {/* Account Financial Strip */}
             <div className="p-2.5 bg-[#0b0e11] border-b border-[#2b2f36] flex gap-5 md:gap-10 text-[9px] md:text-[11px] text-gray-400 font-black uppercase overflow-x-auto whitespace-nowrap custom-scrollbar">
-               <div className="flex gap-2">Balance: <span className="text-white font-mono">${user.forexBalance.toFixed(2)}</span></div>
-               <div className="flex gap-2">Equity: <span className={`font-mono ${totalPL >= 0 ? 'text-green-500' : 'text-red-400'}`}>${equity.toFixed(2)}</span></div>
-               <div className="flex gap-2">Used Margin: <span className="text-white font-mono">${margin.toFixed(2)}</span></div>
-               <div className="flex gap-2">Free Margin: <span className={`font-mono ${freeMargin < 0 ? 'text-red-500' : 'text-green-400'}`}>${freeMargin.toFixed(2)}</span></div>
-               <div className="hidden lg:flex gap-2">Level: <span className="text-white font-mono">{marginLevel.toFixed(2)}%</span></div>
+               <div>Balance: <span className="text-white font-mono">${user.forexBalance.toFixed(2)}</span></div>
+               <div>Equity: <span className={`font-mono ${totalPL >= 0 ? 'text-green-500' : 'text-red-400'}`}>${equity.toFixed(2)}</span></div>
+               <div>Used Margin: <span className="text-white font-mono">${margin.toFixed(2)}</span></div>
+               <div>Free Margin: <span className={`font-mono ${freeMargin < 0 ? 'text-red-500' : 'text-green-400'}`}>${freeMargin.toFixed(2)}</span></div>
+               <div className="hidden lg:flex gap-2">Margin Level: <span className="text-white font-mono">{marginLevel.toFixed(2)}%</span></div>
             </div>
 
-            {/* Terminal Orders Table (RETAINED FULL COLUMNS) */}
+            {/* Terminal Table Area */}
             <div className="flex-1 overflow-auto custom-scrollbar bg-[#181a20] p-2 md:p-4">
                <table className="w-full text-left text-white text-[10px] md:text-[11px] border-collapse">
                 <thead className="text-gray-600 border-b border-white/5 sticky top-0 bg-[#181a20] z-10 font-black uppercase tracking-widest text-[9px]">
@@ -309,8 +302,8 @@ const ForexTrader: React.FC<ForexProps> = ({ user, onUpdateBalance, onSyncUserDa
                         <tr key={o.id} className="hover:bg-white/[0.02] transition-colors group">
                           <td className="py-4 font-black uppercase text-xs sm:text-sm tracking-tighter">{o.symbol}</td>
                           <td className={`py-4 font-black ${o.type === 'BUY' ? 'text-blue-400' : 'text-red-400'}`}>{o.type}</td>
-                          <td className="py-4 text-center font-mono font-black text-gray-400">{o.volume.toFixed(2)}</td>
-                          <td className={`py-4 text-center font-black font-mono text-[14px] md:text-[16px] ${pl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                          <td className="text-center font-mono font-black text-gray-400 text-sm">{o.volume.toFixed(2)}</td>
+                          <td className={`text-center font-black font-mono text-[14px] md:text-[16px] ${pl >= 0 ? 'text-green-500' : 'text-red-400'}`}>
                             {pl >= 0 ? '+' : ''}{pl.toFixed(2)}
                           </td>
                           <td className="py-4 text-right">
@@ -345,7 +338,7 @@ const ForexTrader: React.FC<ForexProps> = ({ user, onUpdateBalance, onSyncUserDa
         </div>
       </div>
 
-      {/* --- [D] POPUPS & MODALS --- */}
+      {/* --- POPUPS & MODALS --- */}
       <DepositModal isOpen={isDepositOpen} onClose={() => setIsDepositOpen(false)} user={user} />
       <AccountModal isOpen={isAccountOpen} onClose={() => setIsAccountOpen(false)} user={user} />
       <WithdrawModal isOpen={isWithdrawOpen} onClose={() => setIsWithdrawOpen(false)} user={user} walletType="forex" />
