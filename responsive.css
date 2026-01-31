@@ -1,0 +1,73 @@
+/* Responsive styles for Zentum project */
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f8f9fa;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* Make all images responsive */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Responsive typography */
+h1, h2, h3, h4, h5, h6 {
+  word-break: break-word;
+}
+
+/* Responsive padding and margin for sections */
+section, .section {
+  padding: 16px 8px;
+}
+
+/* Responsive grid for cards or columns */
+.row, .grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.col, .column {
+  flex: 1 1 300px;
+  min-width: 250px;
+}
+
+/* Media Queries for mobile */
+@media (max-width: 768px) {
+  .container {
+    padding: 8px;
+  }
+  .row, .grid {
+    flex-direction: column;
+    gap: 8px;
+  }
+  section, .section {
+    padding: 8px 4px;
+  }
+  h1 {
+    font-size: 1.5rem;
+  }
+  h2 {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 2px;
+  }
+  h1 {
+    font-size: 1.1rem;
+  }
+  h2 {
+    font-size: 1rem;
+  }
+}
