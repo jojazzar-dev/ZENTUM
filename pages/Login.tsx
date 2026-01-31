@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import '../login-mobile-fix.css';
 import { useNavigate } from 'react-router-dom';
 import { AuthService } from '../services/authService';
 
