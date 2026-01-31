@@ -1,0 +1,90 @@
+/* ZENTUM GLOBAL STYLES & MOBILE OVERRIDES */
+
+/* 1. إعدادات أساسية لضمان شعور "التطبيق" وليس الموقع */
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* منع سحب الصفحة كاملة لضمان ثبات الشارت */
+  background-color: #0b0e11;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 2. تحسين شكل أشرطة التمرير لتبدو احترافية */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #f3ba2f; /* اللون الذهبي الخاص بـ ZENTUM */
+  border-radius: 10px;
+}
+
+/* 3. تنسيقات خاصة للموبايل (أقل من 768 بكسل) */
+@media (max-width: 768px) {
+  
+  /* تصغير حجم الخطوط في الجداول لكي تتسع الأرقام */
+  table {
+    font-size: 10px !important;
+    table-layout: fixed;
+    width: 100%;
+  }
+
+  th, td {
+    padding: 8px 4px !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* إجبار الشارت (Iframe) على أخذ مساحة رؤية كافية */
+  iframe {
+    min-height: 380px !important;
+    width: 100% !important;
+  }
+
+  /* تنسيق أزرار الشراء والبيع لتكون سهلة الضغط بالإبهام */
+  button {
+    font-size: 11px !important;
+    letter-spacing: 0.05em;
+    font-weight: 900 !important;
+  }
+
+  /* شريط العملات العلوي (الذي سيحل محل السايدبار في الموبايل) */
+  .market-strip-mobile {
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    gap: 10px;
+    padding: 10px;
+    background: #1e2329;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  /* منع ظهور الـ Horizontal Scrollbar في شريط العملات العلوي */
+  .market-strip-mobile::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* 4. ميزة الـ Glassmorphism للقوائم */
+.glass-panel {
+  background: rgba(30, 35, 41, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* 5. تثبيت الـ Bottom Terminal في أسفل الشاشة */
+.mobile-terminal-fixed {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 80;
+}

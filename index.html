@@ -1,18 +1,46 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ZENTUM | Forex & Crypto Trading</title>
+    <!-- منع الزوم عند الضغط على المدخلات وضمان ملء الشاشة بالكامل حتى خلف النوتش في الآيفون -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>ZENTUM | Professional Trading Terminal</title>
+    
+    <!-- إعدادات تطبيق الموبايل (PWA) -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ZENTUM">
+    <link rel="apple-touch-icon" href="/logo192.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0b0e11">
+
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    
     <style>
-      body {
+      /* قواعد التنسيق لمنع الموقع من التصرف كصفحة ويب عادية */
+      body, html {
+        margin: 0;
+        padding: 0;
         font-family: 'Inter', sans-serif;
         background-color: #0b0e11;
         color: #ffffff;
+        /* منع سحب الصفحة للأسفل لعمل ريفريش في الموبايل لكي لا يختفي الشارت */
+        overscroll-behavior-y: none;
+        overflow: hidden;
+        height: 100%;
+        width: 100%;
+        /* إزالة اللون الرمادي عند الضغط في الموبايل */
+        -webkit-tap-highlight-color: transparent;
       }
+
+      #root {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+
       .custom-scrollbar::-webkit-scrollbar {
         width: 4px;
         height: 4px;
@@ -24,28 +52,41 @@
         background: #2d3748;
         border-radius: 10px;
       }
+      
       .crypto-gradient {
         background: linear-gradient(135deg, #f3ba2f 0%, #1e2329 100%);
       }
       .forex-gradient {
         background: linear-gradient(135deg, #2962ff 0%, #1e2329 100%);
       }
+
+      /* تحسين عرض الـ Iframe الخاص بالشارت في الموبايل */
+      @media (max-width: 768px) {
+        iframe {
+          height: 100% !important;
+          border-radius: 0 !important;
+        }
+      }
     </style>
-  <script type="importmap">
-{
-  "imports": {
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "react": "https://esm.sh/react@^19.2.3",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "react-router-dom": "https://esm.sh/react-router-dom@^7.12.0",
-    "@google/genai": "https://esm.sh/@google/genai@^1.37.0"
-  }
-}
-</script>
-<link rel="stylesheet" href="/index.css">
-</head>
+
+    <script type="importmap">
+    {
+      "imports": {
+        "react/": "https://esm.sh/react@^19.2.3/",
+        "react": "https://esm.sh/react@^19.2.3",
+        "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+        "react-router-dom": "https://esm.sh/react-router-dom@^7.12.0",
+        "@google/genai": "https://esm.sh/@google/genai@^1.37.0",
+        "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
+        "firebase/auth": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js",
+        "firebase/firestore": "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"
+      }
+    }
+    </script>
+    <link rel="stylesheet" href="/index.css">
+  </head>
   <body>
     <div id="root"></div>
-  <script type="module" src="/index.tsx"></script>
-</body>
+    <script type="module" src="/index.tsx"></script>
+  </body>
 </html>

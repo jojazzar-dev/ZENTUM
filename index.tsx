@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
+// استيراد ملف التنسيقات العالمي لضبط توافق الموبايل
+import './index.css'; 
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -14,30 +16,34 @@ root.render(
   </React.StrictMode>
 );
 
-// --- محرك تحويل الموقع إلى تطبيق (PWA Registration Engine) ---
-// هذا الكود هو المسؤول عن إظهار رسالة "Add to Home Screen"
+/**
+ * ZENTUM PWA ENGINE - REGISTRATION SYSTEM
+ * ---------------------------------------
+ * مسؤول عن تحويل الموقع إلى تطبيق قابل للتثبيت على واجهة الموبايل
+ */
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    // تسجيل ملف الخدمة من المسار الرئيسي لضمان تغطية كامل صفحات التداول
+    // تسجيل ملف الخدمة sw.js لضمان عمل التطبيق بدون إنترنت وتجاوز الحظر
     navigator.serviceWorker.register('/sw.js', { scope: '/' })
       .then(registration => {
         console.log('ZENTUM PWA: Engine is Online and ready.');
 
-        // فحص التحديثات الجديدة لضمان دقة الأسعار دائماً
+        // نظام مراقبة التحديثات لضمان وصول أحدث الأسعار للمتداول
         registration.onupdatefound = () => {
           const installingWorker = registration.installing;
           if (installingWorker == null) return;
           installingWorker.onstatechange = () => {
             if (installingWorker.state === 'installed') {
               if (navigator.serviceWorker.controller) {
-                console.log('ZENTUM: New version available. Please refresh.');
+                console.log('ZENTUM PWA: New core update detected. Refreshing assets...');
+                // يمكن إضافة إشعار للمستخدم هنا لعمل Refresh
               }
             }
           };
         };
       })
       .catch(error => {
-        console.error('ZENTUM PWA: System failed to start.', error);
+        console.error('ZENTUM PWA: System failed to initialize.', error);
       });
   });
 }
