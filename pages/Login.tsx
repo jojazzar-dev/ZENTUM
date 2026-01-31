@@ -8,11 +8,12 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [loading, setLoading] = useState(false); // حالة التحميل
+  // const [loading, setLoading] = useState(false); // حالة التحميل
+  const loading = false; // تعطيل التحميل مؤقتًا
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    // setLoading(true); // تعطيل التحميل مؤقتًا
 
     try {
       if (isRegister) {
@@ -41,7 +42,7 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
     } catch (err) {
       alert("An error occurred during authentication.");
     } finally {
-      setLoading(false);
+      // setLoading(false); // تعطيل التحميل مؤقتًا
     }
   };
 
