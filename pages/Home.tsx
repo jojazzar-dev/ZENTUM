@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import '../responsive.css';
 import { useNavigate } from 'react-router-dom';
 import { APP_NAME, INITIAL_FOREX_DATA, INITIAL_CRYPTO_DATA } from '../constants';
 import Logo from '../components/Logo'; 
