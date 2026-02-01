@@ -1,17 +1,28 @@
-/* ZENTUM GLOBAL STYLES & MOBILE OVERRIDES */
+/* ZENTUM GLOBAL STYLES & MOBILE OVERRIDES - FULL VERSION */
 
-/* 1. إعدادات أساسية لضمان شعور "التطبيق" وليس الموقع */
+/* 1. إعدادات أساسية لضمان شعور "التطبيق" */
 html, body {
-  height: 100%;
+  height: auto !important; 
+  min-height: 100%;
   width: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden; /* منع سحب الصفحة كاملة لضمان ثبات الشارت */
+  overflow-y: auto !important; /* تحرير السكرول */
+  overflow-x: hidden;
   background-color: #0b0e11;
   -webkit-font-smoothing: antialiased;
+  scroll-behavior: smooth;
 }
 
-/* 2. تحسين شكل أشرطة التمرير لتبدو احترافية */
+/* تحرير الحقول ومنع التجمد عند الكتابة */
+input, textarea, select {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  pointer-events: auto !important;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+/* 2. تحسين شكل أشرطة التمرير */
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;
   height: 4px;
@@ -20,14 +31,12 @@ html, body {
   background: rgba(255, 255, 255, 0.02);
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #f3ba2f; /* اللون الذهبي الخاص بـ ZENTUM */
+  background: #f3ba2f; 
   border-radius: 10px;
 }
 
 /* 3. تنسيقات خاصة للموبايل (أقل من 768 بكسل) */
 @media (max-width: 768px) {
-  
-  /* تصغير حجم الخطوط في الجداول لكي تتسع الأرقام */
   table {
     font-size: 10px !important;
     table-layout: fixed;
@@ -41,20 +50,17 @@ html, body {
     white-space: nowrap;
   }
 
-  /* إجبار الشارت (Iframe) على أخذ مساحة رؤية كافية */
   iframe {
     min-height: 380px !important;
     width: 100% !important;
   }
 
-  /* تنسيق أزرار الشراء والبيع لتكون سهلة الضغط بالإبهام */
   button {
+    min-height: 44px;
     font-size: 11px !important;
-    letter-spacing: 0.05em;
     font-weight: 900 !important;
   }
 
-  /* شريط العملات العلوي (الذي سيحل محل السايدبار في الموبايل) */
   .market-strip-mobile {
     display: flex;
     overflow-x: auto;
@@ -66,25 +72,31 @@ html, body {
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   }
 
-  /* منع ظهور الـ Horizontal Scrollbar في شريط العملات العلوي */
   .market-strip-mobile::-webkit-scrollbar {
     display: none;
   }
 }
 
-/* 4. ميزة الـ Glassmorphism للقوائم */
+/* 4. ميزة الـ Glassmorphism (كاملة) */
 .glass-panel {
-  background: rgba(30, 35, 41, 0.8);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(30, 35, 41, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
-/* 5. تثبيت الـ Bottom Terminal في أسفل الشاشة */
-.mobile-terminal-fixed {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 80;
+/* 5. تنسيقات الحاويات التجميلية التي حذفت سابقاً */
+.main-container-gradient {
+  background: radial-gradient(circle at top right, rgba(243, 186, 47, 0.05), transparent);
+}
+
+.card-shadow-gold {
+  box-shadow: 0 0 20px rgba(243, 186, 47, 0.1);
+}
+
+.crypto-card-hover:hover {
+  border-color: rgba(243, 186, 47, 0.5);
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
 }

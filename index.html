@@ -2,40 +2,39 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <!-- منع الزوم عند الضغط على المدخلات وضمان ملء الشاشة بالكامل حتى خلف النوتش في الآيفون -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <!-- التعديل الاحترافي: viewport مرن يمنع مشاكل الكتابة ويدعم الـ Notch -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>ZENTUM | Professional Trading Terminal</title>
     
-    <!-- إعدادات تطبيق الموبايل (PWA) -->
+    <!-- PWA Settings (كاملة كما كانت) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ZENTUM">
     <link rel="apple-touch-icon" href="/logo192.png">
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#0b0e11">
+    <meta name="theme-color" content="#181a20">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
     
     <style>
-      /* قواعد التنسيق لمنع الموقع من التصرف كصفحة ويب عادية */
+      /* استعادة كافة التنسيقات الأصلية مع تحرير السكرول */
       body, html {
         margin: 0;
         padding: 0;
         font-family: 'Inter', sans-serif;
         background-color: #0b0e11;
         color: #ffffff;
-        /* منع سحب الصفحة للأسفل لعمل ريفريش في الموبايل لكي لا يختفي الشارت */
-        overscroll-behavior-y: none;
-        overflow: hidden;
-        height: 100%;
-        width: 100%;
-        /* إزالة اللون الرمادي عند الضغط في الموبايل */
+        /* الإصلاح: السماح بالتمرير العمودي ومنع التجمد */
+        overflow-y: auto !important; 
+        overflow-x: hidden;
+        height: auto; 
+        min-height: 100%;
         -webkit-tap-highlight-color: transparent;
       }
 
       #root {
-        height: 100%;
+        min-height: 100vh;
         width: 100%;
         display: flex;
         flex-direction: column;
@@ -49,7 +48,7 @@
         background: transparent;
       }
       .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #2d3748;
+        background: #f3ba2f;
         border-radius: 10px;
       }
       
@@ -60,11 +59,14 @@
         background: linear-gradient(135deg, #2962ff 0%, #1e2329 100%);
       }
 
-      /* تحسين عرض الـ Iframe الخاص بالشارت في الموبايل */
+      /* تنسيقات إضافية لضمان عدم تداخل العناصر في الموبايل */
       @media (max-width: 768px) {
         iframe {
-          height: 100% !important;
-          border-radius: 0 !important;
+          min-height: 400px !important;
+          border: none;
+        }
+        .hide-on-mobile {
+          display: none !important;
         }
       }
     </style>
