@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import './responsive.css';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from './firebase';
