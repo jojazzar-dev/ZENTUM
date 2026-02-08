@@ -39,8 +39,8 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
   
-  // حالات التيرمينال السفلي (Assets / History)
-  const [bottomTab, setBottomTab] = useState<'ASSETS' | 'HISTORY'>('ASSETS');
+  // حالات التحكم في العرض (Chart / Assets / History)
+  const [viewMode, setViewMode] = useState<'chart' | 'active' | 'history'>('chart');
 
   // جلب البيانات السحابية الحقيقية من كائن المستخدم المحدث لحظياً عبر Props
   const holdings = user.cryptoHoldings || [];
@@ -243,76 +243,110 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
             </div>
           </div>
 
-          {/* High-Definition Chart Section */}
-          <div className="flex-1 bg-black relative shadow-inner">
-            <iframe 
-              src={`https://s.tradingview.com/widgetembed/?symbol=BINANCE:${selected}USDT&interval=1&theme=dark&style=1&locale=en&enable_publishing=false&hide_top_toolbar=false&allow_symbol_change=false`} 
-              className="w-full h-full border-none" 
-              title="Cloud Engine Chart" 
-            />
-          </div>
+          {/* Main Display Area - Chart / Assets / History */}
+          <div className="flex-1 bg-black relative shadow-inner overflow-hidden">
+            {/* Chart View */}
+            {viewMode === 'chart' && (
+              <iframe 
+                src={`https://s.tradingview.com/widgetembed/?symbol=BINANCE:${selected}USDT&interval=1&theme=dark&style=1&locale=en&enable_publishing=false&hide_top_toolbar=false&allow_symbol_change=false`} 
+                className="w-full h-full border-none" 
+                title="Cloud Engine Chart" 
+              />
+            )}
 
-          {/* --- [C] MT5 STYLE BOTTOM TERMINAL PANEL --- */}
-          <div className="h-60 md:h-72 bg-[#181a20] border-t border-white/10 flex flex-col overflow-hidden shrink-0 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
-             
-             {/* Terminal Navigation */}
-             <div className="flex bg-[#0b0e11] text-[9px] text-gray-500 border-b border-white/5 font-black uppercase tracking-widest">
-                <button onClick={() => setBottomTab('ASSETS')} className={`px-12 py-4 border-r border-white/5 transition-all ${bottomTab === 'ASSETS' ? 'bg-[#1e2329] text-yellow-500 font-black' : 'hover:text-white'}`}>Active Portfolio</button>
-                <button onClick={() => setBottomTab('HISTORY')} className={`px-12 py-4 border-r border-white/5 transition-all ${bottomTab === 'HISTORY' ? 'bg-[#1e2329] text-yellow-500 font-black' : 'hover:text-white'}`}>Trade History</button>
-             </div>
-             
-             {/* Data Table Area */}
-             <div className="flex-1 overflow-y-auto custom-scrollbar p-3 md:p-5 bg-[#181a20]">
-                <table className="w-full text-left text-white border-collapse">
-                   <thead className="text-gray-600 border-b border-white/5 uppercase font-black tracking-widest text-[8px] md:text-[9px]">
-                     <tr>
-                        <th className="pb-3 md:pb-4 pr-2 md:pr-4">Asset Identity</th>
-                        <th className="pb-3 md:pb-4 pr-2 md:pr-4 text-center">Current Vol</th>
-                        <th className="pb-3 md:pb-4 pr-2 md:pr-4 text-center hidden sm:table-cell">Avg Entry</th>
-                        <th className="text-right pb-3 md:pb-4">{bottomTab === 'ASSETS' ? 'Floating P/L' : 'Closed Result'}</th>
-                     </tr>
-                   </thead>
-                   <tbody className="divide-y divide-white/[0.03]">
-                     {bottomTab === 'ASSETS' ? (
-                       holdings.map((h: any) => {
+            {/* Active Holdings View */}
+            {viewMode === 'active' && (
+              <div className="flex flex-col h-full bg-[#0b0e11] overflow-hidden">
+                <div className="p-3 bg-[#181a20] border-b border-white/5 text-[9px] text-gray-500 font-black uppercase">Active Holdings</div>
+                <div className="flex-1 overflow-auto custom-scrollbar">
+                   <table className="w-full text-left text-white border-collapse">
+                     <thead className="text-gray-600 border-b border-white/5 uppercase font-black tracking-widest text-[8px] md:text-[9px] sticky top-0 bg-[#181a20] z-10">
+                       <tr>
+                          <th className="p-3 md:p-4 pr-2">Asset</th>
+                          <th className="p-3 md:p-4 text-center">Volume</th>
+                          <th className="p-3 md:p-4 text-center hidden sm:table-cell">Entry Price</th>
+                          <th className="text-right p-3 md:p-4">P&L</th>
+                       </tr>
+                     </thead>
+                     <tbody className="divide-y divide-white/[0.03]">
+                       {holdings.map((h: any) => {
                          const currentVal = h.qty * (livePrices[h.symbol]?.USD || 0);
                          const pl = currentVal - (h.qty * h.buyPrice);
                          return (
-                           <tr key={h.id} className="hover:bg-white/[0.01] transition-colors group">
-                             <td className="py-4 md:py-5 font-black text-white uppercase text-[10px] md:text-xs tracking-tighter">{h.symbol} / USDT</td>
-                             <td className="py-4 md:py-5 text-center font-mono font-black text-gray-300 text-xs md:text-sm">{h.qty.toFixed(4)}</td>
-                             <td className="py-4 md:py-5 text-center text-gray-500 font-mono italic text-[10px] md:text-xs hidden sm:table-cell">${h.buyPrice.toLocaleString()}</td>
-                             <td className={`text-right py-4 md:py-5 font-black font-mono text-[13px] md:text-base ${pl >= 0 ? 'text-[#02c076]' : 'text-[#f6465d]'}`}>
-                               {pl >= 0 ? '+' : ''}{pl.toFixed(2)} <span className="text-[9px] opacity-50 hidden md:inline">USDT</span>
+                           <tr key={h.id} className="hover:bg-white/[0.02] transition-colors">
+                             <td className="p-4 font-black text-white uppercase text-[10px] md:text-xs tracking-tighter">{h.symbol} / USDT</td>
+                             <td className="p-4 text-center font-mono font-black text-gray-300 text-xs">{h.qty.toFixed(4)}</td>
+                             <td className="p-4 text-center text-gray-500 font-mono italic text-[10px] hidden sm:table-cell">${h.buyPrice.toLocaleString()}</td>
+                             <td className={`text-right p-4 font-black font-mono text-sm ${pl >= 0 ? 'text-[#02c076]' : 'text-[#f6465d]'}`}>
+                               {pl >= 0 ? '+' : ''}{pl.toFixed(2)}
                              </td>
                            </tr>
                          );
-                       })
-                     ) : (
-                       history.filter(h => h.marketType === MarketType.CRYPTO).map((h: any) => (
-                         <tr key={h.id} className="border-b border-white/[0.02] opacity-60">
-                           <td className="py-4 md:py-5 font-black text-white uppercase text-[10px] md:text-xs">{h.symbol} / USDT</td>
-                           <td className="py-4 md:py-5 text-center font-mono text-xs md:text-sm">{h.volume.toFixed(4)}</td>
-                           <td className="py-4 md:py-5 text-center text-gray-500 font-mono italic text-[10px] md:text-xs hidden sm:table-cell">${h.openPrice.toLocaleString()}</td>
-                           <td className={`text-right py-4 md:py-5 font-black font-mono text-[13px] md:text-base ${h.profit >= 0 ? 'text-[#02c076]' : 'text-[#f6465d]'}`}>
+                       })}
+                     </tbody>
+                   </table>
+                   {holdings.length === 0 && (
+                     <div className="p-16 text-center text-gray-700 font-black uppercase tracking-[0.4em] italic opacity-30">No Holdings</div>
+                   )}
+                </div>
+              </div>
+            )}
+
+            {/* History View */}
+            {viewMode === 'history' && (
+              <div className="flex flex-col h-full bg-[#0b0e11] overflow-hidden">
+                <div className="p-3 bg-[#181a20] border-b border-white/5 text-[9px] text-gray-500 font-black uppercase">Trade History</div>
+                <div className="flex-1 overflow-auto custom-scrollbar">
+                   <table className="w-full text-left text-white border-collapse">
+                     <thead className="text-gray-600 border-b border-white/5 uppercase font-black tracking-widest text-[8px] md:text-[9px] sticky top-0 bg-[#181a20] z-10">
+                       <tr>
+                          <th className="p-3 md:p-4 pr-2">Asset</th>
+                          <th className="p-3 md:p-4 text-center">Volume</th>
+                          <th className="p-3 md:p-4 text-center hidden sm:table-cell">Entry</th>
+                          <th className="text-right p-3 md:p-4">Profit</th>
+                       </tr>
+                     </thead>
+                     <tbody className="divide-y divide-white/[0.03]">
+                       {history.filter(h => h.marketType === MarketType.CRYPTO).map((h: any) => (
+                         <tr key={h.id} className="hover:bg-white/[0.02] transition-colors opacity-70">
+                           <td className="p-4 font-black text-white uppercase text-[10px] md:text-xs">{h.symbol} / USDT</td>
+                           <td className="p-4 text-center font-mono text-xs">{h.volume.toFixed(4)}</td>
+                           <td className="p-4 text-center text-gray-500 font-mono italic text-[10px] hidden sm:table-cell">${h.openPrice.toLocaleString()}</td>
+                           <td className={`text-right p-4 font-black font-mono text-sm ${h.profit >= 0 ? 'text-[#02c076]' : 'text-[#f6465d]'}`}>
                              {h.profit >= 0 ? '+' : ''}{h.profit.toFixed(2)}
                            </td>
                          </tr>
-                       ))
-                     )}
-                   </tbody>
-                </table>
-                {(bottomTab === 'ASSETS' ? holdings : history).length === 0 && (
-                  <div className="p-16 text-center text-gray-800 font-black uppercase tracking-[0.3em] italic opacity-30">No Cloud Database Records Found</div>
-                )}
-             </div>
+                       ))}
+                     </tbody>
+                   </table>
+                   {history.length === 0 && (
+                     <div className="p-16 text-center text-gray-700 font-black uppercase tracking-[0.4em] italic opacity-30">No History</div>
+                   )}
+                </div>
+              </div>
+            )}
+          </div>
 
-             {/* Footer Statistics Strip */}
-             <div className="p-2.5 bg-[#0b0e11] border-t border-white/5 flex gap-10 text-[9px] text-gray-500 font-black uppercase tracking-widest overflow-x-auto whitespace-nowrap">
-                <div>Infrastructure: <span className="text-green-500 italic uppercase">Optimized</span></div>
-                <div>Server Status: <span className="text-white uppercase tracking-tighter">Encrypted Node 01</span></div>
-                <div className="ml-auto opacity-30 font-mono italic uppercase">ZENTUM GLOBAL CLOUD V5.2</div>
-             </div>
+          {/* Control Buttons - Chart / Active / History */}
+          <div className="bg-[#181a20] border-t border-white/5 flex gap-2 p-2 shrink-0 shadow-lg">
+            <button 
+              onClick={() => setViewMode('chart')}
+              className={`flex-1 px-4 py-3 rounded-lg font-black uppercase text-[10px] tracking-widest transition-all ${viewMode === 'chart' ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/40' : 'bg-black/30 text-gray-400 hover:text-white border border-white/10'}`}
+            >
+              📊 Chart
+            </button>
+            <button 
+              onClick={() => setViewMode('active')}
+              className={`flex-1 px-4 py-3 rounded-lg font-black uppercase text-[10px] tracking-widest transition-all ${viewMode === 'active' ? 'bg-yellow-600 text-white shadow-lg shadow-yellow-900/40' : 'bg-black/30 text-gray-400 hover:text-white border border-white/10'}`}
+            >
+              📈 Active
+            </button>
+            <button 
+              onClick={() => setViewMode('history')}
+              className={`flex-1 px-4 py-3 rounded-lg font-black uppercase text-[10px] tracking-widest transition-all ${viewMode === 'history' ? 'bg-green-600 text-white shadow-lg shadow-green-900/40' : 'bg-black/30 text-gray-400 hover:text-white border border-white/10'}`}
+            >
+              📋 History
+            </button>
           </div>
         </div>
       </div>

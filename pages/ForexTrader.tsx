@@ -39,8 +39,8 @@ const ForexTrader: React.FC<ForexProps> = ({ user, onUpdateBalance, onSyncUserDa
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
   
-  // حالات التحكم في التيرمينال السفلي
-  const [bottomTab, setBottomTab] = useState<'TRADE' | 'HISTORY'>('TRADE');
+  // حالات التحكم في العرض (Chart / Active Positions / History)
+  const [viewMode, setViewMode] = useState<'chart' | 'active' | 'history'>('chart');
 
   // جلب البيانات السحابية الحقيقية من كائن المستخدم المحدث لحظياً
   const orders = user.forexOrders || [];
@@ -311,72 +311,108 @@ const ForexTrader: React.FC<ForexProps> = ({ user, onUpdateBalance, onSyncUserDa
             </div>
           </div>
 
-          {/* High-Definition Interactive Chart Section */}
-          <div className="flex-1 bg-black relative shadow-inner">
-            <iframe 
-              src={`https://s.tradingview.com/widgetembed/?symbol=${selected === 'XAUUSD' ? 'OANDA:XAUUSD' : selected === 'NAS100' ? 'CAPITALCOM:US100' : 'FX_IDC:' + selected}&interval=1&theme=dark&style=1&locale=en&enable_publishing=false&hide_top_toolbar=false&allow_symbol_change=false`} 
-              className="w-full h-full border-none" 
-              title="Forex Live Feed"
-            />
+          {/* Main Display Area - Chart / Active Positions / History */}
+          <div className="flex-1 bg-black relative shadow-inner overflow-hidden">
+            {/* Chart View */}
+            {viewMode === 'chart' && (
+              <iframe 
+                src={`https://s.tradingview.com/widgetembed/?symbol=${selected === 'XAUUSD' ? 'OANDA:XAUUSD' : selected === 'NAS100' ? 'CAPITALCOM:US100' : 'FX_IDC:' + selected}&interval=1&theme=dark&style=1&locale=en&enable_publishing=false&hide_top_toolbar=false&allow_symbol_change=false`} 
+                className="w-full h-full border-none" 
+                title="Forex Live Feed"
+              />
+            )}
+
+            {/* Active Positions View */}
+            {viewMode === 'active' && (
+              <div className="flex flex-col h-full bg-[#0b0e11] overflow-hidden">
+                {/* Financial Stats */}
+                <div className="p-3 bg-[#181a20] border-b border-[#2b2f36] flex gap-4 md:gap-8 text-[9px] md:text-[10px] text-gray-400 font-bold uppercase overflow-x-auto whitespace-nowrap">
+                   <div className="flex gap-2 text-white">Balance: <span className="text-white font-mono font-black">${user.forexBalance.toFixed(2)}</span></div>
+                   <div className="flex gap-2">Equity: <span className={`font-mono font-black ${totalPL >= 0 ? 'text-green-500' : 'text-red-500'}`}>${equity.toFixed(2)}</span></div>
+                   <div className="flex gap-2">Used Margin: <span className="text-white font-mono font-black">${margin.toFixed(2)}</span></div>
+                   <div className="flex gap-2 text-white">Free: <span className={`font-mono font-black ${freeMargin < 0 ? 'text-red-500' : 'text-green-400'}`}>${freeMargin.toFixed(2)}</span></div>
+                </div>
+
+                {/* Active Orders Table */}
+                <div className="flex-1 overflow-auto custom-scrollbar">
+                   <table className="w-full text-left text-white text-[10px] md:text-[11px] border-collapse">
+                    <thead className="text-gray-600 border-b border-white/5 sticky top-0 bg-[#181a20] z-10 font-black uppercase tracking-widest text-[9px]">
+                      <tr><th className="p-3 pr-2">Symbol</th><th>Type</th><th className="text-center">Volume</th><th className="text-center">P/L</th><th className="text-right">Action</th></tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/[0.03]">
+                      {orders.map((o: any) => {
+                        const pl = calculatePL(o);
+                        return (
+                          <tr key={o.id} className="hover:bg-white/[0.02] transition-colors">
+                            <td className="p-4 font-black uppercase text-xs tracking-tighter">{o.symbol}</td>
+                            <td className={`p-4 font-black ${o.type === 'BUY' ? 'text-blue-400' : 'text-red-400'}`}>{o.type}</td>
+                            <td className="p-4 text-center font-mono font-black text-gray-400">{o.volume.toFixed(2)}</td>
+                            <td className={`p-4 text-center font-black font-mono ${pl >= 0 ? 'text-green-500' : 'text-red-400'}`}>{pl.toFixed(2)}</td>
+                            <td className="p-4 text-right"><button onClick={() => closeOrder(o.id)} className="bg-red-500/10 text-red-500 hover:bg-red-600 hover:text-white px-2 py-1 rounded font-black text-[8px] uppercase border border-red-500/20 transition-all">Close</button></td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                   </table>
+                   {orders.length === 0 && (
+                     <div className="p-16 text-center text-gray-700 font-black uppercase tracking-[0.4em] italic opacity-30">No Active Positions</div>
+                   )}
+                </div>
+              </div>
+            )}
+
+            {/* History View */}
+            {viewMode === 'history' && (
+              <div className="flex flex-col h-full bg-[#0b0e11] overflow-hidden">
+                {/* History Header */}
+                <div className="p-3 bg-[#181a20] border-b border-[#2b2f36] text-[9px] text-gray-500 font-black uppercase">Trade History</div>
+
+                {/* History Table */}
+                <div className="flex-1 overflow-auto custom-scrollbar">
+                   <table className="w-full text-left text-white text-[10px] md:text-[11px] border-collapse">
+                    <thead className="text-gray-600 border-b border-white/5 sticky top-0 bg-[#181a20] z-10 font-black uppercase tracking-widest text-[9px]">
+                      <tr><th className="p-3 pr-2">Symbol</th><th>Type</th><th className="text-center">Volume</th><th className="text-center">Profit</th><th className="text-right">Date</th></tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/[0.03]">
+                      {history.filter((h: any) => h.marketType === MarketType.FOREX).map((h: any) => (
+                        <tr key={h.id} className="hover:bg-white/[0.02] transition-colors opacity-70">
+                          <td className="p-4 font-black uppercase text-xs tracking-tighter">{h.symbol}</td>
+                          <td className={`p-4 font-black ${h.type === 'BUY' ? 'text-blue-400' : 'text-red-400'}`}>{h.type}</td>
+                          <td className="p-4 text-center font-mono">{h.volume.toFixed(2)}</td>
+                          <td className={`p-4 text-center font-black font-mono ${h.profit >= 0 ? 'text-green-500' : 'text-red-400'}`}>{h.profit.toFixed(2)}</td>
+                          <td className="p-4 text-right text-gray-600 font-mono italic text-[9px]">{new Date(h.timestamp).toLocaleDateString()}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                   </table>
+                   {history.length === 0 && (
+                     <div className="p-16 text-center text-gray-700 font-black uppercase tracking-[0.4em] italic opacity-30">No Trade History</div>
+                   )}
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* --- [D] MT5 STYLE BOTTOM TERMINAL PANEL --- */}
-          <div className="h-56 md:h-64 bg-[#181a20] border-t border-[#2b2f36] flex flex-col overflow-hidden shrink-0 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
-            
-            {/* Terminal Navigation Tabs */}
-            <div className="flex bg-[#0b0e11] text-[9px] text-gray-500 border-b border-[#2b2f36] font-black uppercase tracking-widest">
-               <button onClick={() => setBottomTab('TRADE')} className={`px-8 md:px-12 py-3 md:py-4 border-r border-[#2b2f36] transition-all ${bottomTab === 'TRADE' ? 'bg-[#1e2329] text-blue-500 font-black' : 'hover:text-white'}`}>Active Positions</button>
-               <button onClick={() => setBottomTab('HISTORY')} className={`px-8 md:px-12 py-3 md:py-4 border-r border-[#2b2f36] transition-all ${bottomTab === 'HISTORY' ? 'bg-[#1e2329] text-blue-500 font-black' : 'hover:text-white'}`}>Account History</button>
-            </div>
-
-            {/* Account Financial Status Strip */}
-            <div className="p-2.5 bg-[#0b0e11] border-b border-[#2b2f36] flex gap-5 md:gap-10 text-[9px] md:text-[11px] text-gray-400 font-bold uppercase overflow-x-auto whitespace-nowrap custom-scrollbar">
-               <div className="flex gap-2 text-white">Balance: <span className="text-white font-mono">${user.forexBalance.toFixed(2)}</span></div>
-               <div className="flex gap-2">Equity: <span className={`font-mono ${totalPL >= 0 ? 'text-green-500' : 'text-red-500'}`}>${equity.toFixed(2)}</span></div>
-               <div className="flex gap-2">Used Margin: <span className="text-white font-mono">${margin.toFixed(2)}</span></div>
-               <div className="flex gap-2 text-white">Free: <span className={`font-mono ${freeMargin < 0 ? 'text-red-500' : 'text-green-400'}`}>${freeMargin.toFixed(2)}</span></div>
-               <div className="hidden lg:flex gap-2">Margin Level: <span className="text-white font-mono">{marginLevel.toFixed(2)}%</span></div>
-            </div>
-
-            {/* Terminal Data Table Area */}
-            <div className="flex-1 overflow-auto custom-scrollbar bg-[#181a20] p-2 md:p-4">
-               <table className="w-full text-left text-white text-[10px] md:text-[11px] border-collapse">
-                <thead className="text-gray-600 border-b border-white/5 sticky top-0 bg-[#181a20] z-10 font-black uppercase tracking-widest text-[9px]">
-                  <tr><th className="pb-3 pr-2">Symbol</th><th>Type</th><th className="text-center">Volume</th><th className="text-center">Profit</th><th className="text-right pb-3">Action</th></tr>
-                </thead>
-                <tbody className="divide-y divide-white/[0.03]">
-                  {bottomTab === 'TRADE' ? (
-                    orders.map((o: any) => {
-                      const pl = calculatePL(o);
-                      return (
-                        <tr key={o.id} className="hover:bg-white/[0.02] transition-colors group">
-                          <td className="py-4 font-black uppercase text-[10px] sm:text-xs tracking-tighter">{o.symbol}</td>
-                          <td className={`py-4 font-black ${o.type === 'BUY' ? 'text-blue-400' : 'text-red-400'}`}>{o.type}</td>
-                          <td className="py-4 text-center font-mono font-black text-gray-400 text-sm">{o.volume.toFixed(2)}</td>
-                          <td className={`py-4 text-center font-black font-mono text-[14px] md:text-[16px] ${pl >= 0 ? 'text-green-500' : 'text-red-400'}`}>{pl.toFixed(2)}</td>
-                          <td className="py-4 text-right">
-                            <button onClick={() => closeOrder(o.id)} className="bg-red-500/10 text-red-500 hover:bg-red-600 hover:text-white px-3 py-1 rounded-lg font-black text-[9px] uppercase border border-red-500/20 transition-all active:scale-95">Close</button>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  ) : (
-                    history.filter((h: any) => h.marketType === MarketType.FOREX).map((h: any) => (
-                      <tr key={h.id} className="border-b border-white/[0.02] opacity-60">
-                        <td className="py-4 font-black uppercase text-[10px] sm:text-xs">{h.symbol}</td>
-                        <td className={`py-4 font-black ${h.type === 'BUY' ? 'text-blue-400' : 'text-red-400'}`}>{h.type}</td>
-                        <td className="py-4 text-center font-mono">{h.volume.toFixed(2)}</td>
-                        <td className={`py-4 text-center font-black font-mono text-[14px] ${h.profit >= 0 ? 'text-green-500' : 'text-red-400'}`}>{h.profit.toFixed(2)}</td>
-                        <td className="text-right p-3 text-gray-600 font-mono italic text-[9px]">{new Date(h.timestamp).toLocaleDateString()}</td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-               </table>
-               {(bottomTab === 'TRADE' ? orders : history).length === 0 && (
-                 <div className="p-16 text-center text-gray-700 font-black uppercase tracking-[0.4em] italic opacity-30">No Database Record Found</div>
-               )}
-            </div>
+          {/* Control Buttons - Chart / Active / History */}
+          <div className="bg-[#181a20] border-t border-[#2b2f36] flex gap-2 p-2 shrink-0 shadow-lg">
+            <button 
+              onClick={() => setViewMode('chart')}
+              className={`flex-1 px-4 py-3 rounded-lg font-black uppercase text-[10px] tracking-widest transition-all ${viewMode === 'chart' ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/40' : 'bg-black/30 text-gray-400 hover:text-white border border-white/10'}`}
+            >
+              📊 Chart
+            </button>
+            <button 
+              onClick={() => setViewMode('active')}
+              className={`flex-1 px-4 py-3 rounded-lg font-black uppercase text-[10px] tracking-widest transition-all ${viewMode === 'active' ? 'bg-yellow-600 text-white shadow-lg shadow-yellow-900/40' : 'bg-black/30 text-gray-400 hover:text-white border border-white/10'}`}
+            >
+              📈 Active
+            </button>
+            <button 
+              onClick={() => setViewMode('history')}
+              className={`flex-1 px-4 py-3 rounded-lg font-black uppercase text-[10px] tracking-widest transition-all ${viewMode === 'history' ? 'bg-green-600 text-white shadow-lg shadow-green-900/40' : 'bg-black/30 text-gray-400 hover:text-white border border-white/10'}`}
+            >
+              📋 History
+            </button>
           </div>
         </div>
       </div>
