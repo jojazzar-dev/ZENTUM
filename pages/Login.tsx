@@ -71,68 +71,45 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Name Field - Register Only */}
           {isRegister && (
-            <div className="relative">
-              <input 
-                key="name-input"
-                placeholder="Full Name" 
-                value={name} 
-                onChange={(e) => {
-                  console.log('Name changed to:', e.target.value);
-                  setName(e.target.value);
-                }} 
-                onInput={(e) => {
-                  console.log('Name input event:', (e.target as any).value);
-                }}
-                className="w-full bg-black/30 border border-white/10 px-4 py-3 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 text-base"
-                disabled={loading}
-                autoComplete="off"
-              />
-            </div>
+            <input 
+              type="text" 
+              placeholder="Full Name" 
+              value={name} 
+              onChange={e => setName(e.target.value)} 
+              className="w-full bg-black/30 border border-white/10 px-4 py-3 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 text-base" 
+              disabled={loading}
+            />
           )}
 
           {/* Email Field */}
           <input 
-            key="email-input"
             type="email" 
             placeholder="Email Address" 
             value={email} 
-            onChange={(e) => {
-              console.log('Email changed to:', e.target.value);
-              setEmail(e.target.value);
-            }} 
+            onChange={e => setEmail(e.target.value)} 
             className="w-full bg-black/30 border border-white/10 px-4 py-3 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 text-base" 
             required 
             disabled={loading}
-            autoComplete="off"
           />
 
           {/* Password Field */}
           <input 
-            key="password-input"
             type="password" 
             placeholder="Password" 
             value={password} 
-            onChange={(e) => {
-              console.log('Password changed');
-              setPassword(e.target.value);
-            }} 
+            onChange={e => setPassword(e.target.value)} 
             className="w-full bg-black/30 border border-white/10 px-4 py-3 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 text-base" 
             required 
             disabled={loading}
-            autoComplete="off"
           />
 
           {/* Confirm Password Field - Register Only */}
           {isRegister && (
             <input 
-              key="confirm-password-input"
               type="password" 
               placeholder="Confirm Password" 
               value={confirmPassword} 
-              onChange={(e) => {
-                console.log('Confirm password changed');
-                setConfirmPassword(e.target.value);
-              }} 
+              onChange={e => setConfirmPassword(e.target.value)} 
               className={`w-full bg-black/30 border px-4 py-3 rounded-xl text-white placeholder-gray-400 focus:outline-none transition-all text-base ${
                 passwordError 
                   ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500' 
@@ -140,7 +117,6 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
               }`}
               required 
               disabled={loading}
-              autoComplete="off"
             />
           )}
 
