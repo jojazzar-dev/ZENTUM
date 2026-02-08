@@ -76,9 +76,10 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
               placeholder="Full Name" 
               value={name} 
               onChange={e => setName(e.target.value)} 
-              className="w-full bg-black/30 border border-white/10 p-3.5 rounded-xl text-white outline-none focus:border-yellow-500 text-base pointer-events-auto" 
+              className="w-full bg-black/30 border border-white/10 p-3.5 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20" 
               required 
               disabled={loading}
+              autoComplete="name"
             />
           )}
 
