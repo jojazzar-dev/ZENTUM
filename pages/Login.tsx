@@ -69,17 +69,20 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Name Field - Always in DOM but collapsed when not needed */}
-          <div className={`overflow-hidden transition-all ${isRegister ? 'max-h-20' : 'max-h-0'}`}>
-            <input 
-              type="text" 
-              placeholder="Full Name" 
-              value={name} 
-              onChange={e => setName(e.target.value)} 
-              className="w-full bg-black/30 border border-white/20 px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 text-base"
-              disabled={loading}
-            />
-          </div>
+          {/* Name Field - Always in DOM using opacity */}
+          <input 
+            type="text" 
+            placeholder="Full Name" 
+            value={name} 
+            onChange={e => setName(e.target.value)} 
+            className={`w-full bg-black/30 border border-white/20 px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 text-base transition-all ${
+              isRegister 
+                ? 'opacity-100 pointer-events-auto' 
+                : 'opacity-0 pointer-events-none absolute'
+            }`}
+            disabled={loading}
+            tabIndex={isRegister ? 0 : -1}
+          />
 
           {/* Email Field */}
           <input 
@@ -103,21 +106,24 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
             disabled={loading}
           />
 
-          {/* Confirm Password Field - Always in DOM but collapsed when not needed */}
-          <div className={`overflow-hidden transition-all ${isRegister ? 'max-h-20' : 'max-h-0'}`}>
-            <input 
-              type="password" 
-              placeholder="Confirm Password" 
-              value={confirmPassword} 
-              onChange={e => setConfirmPassword(e.target.value)} 
-              className={`w-full bg-black/30 border px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none text-base ${
-                passwordError 
-                  ? 'border-red-500 focus:border-red-500' 
-                  : 'border-white/20 focus:border-yellow-400'
-              }`}
-              disabled={loading}
-            />
-          </div>
+          {/* Confirm Password Field - Always in DOM using opacity */}
+          <input 
+            type="password" 
+            placeholder="Confirm Password" 
+            value={confirmPassword} 
+            onChange={e => setConfirmPassword(e.target.value)} 
+            className={`w-full bg-black/30 border px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none text-base transition-all ${
+              isRegister 
+                ? 'opacity-100 pointer-events-auto' 
+                : 'opacity-0 pointer-events-none absolute'
+            } ${
+              passwordError 
+                ? 'border-red-500 focus:border-red-500' 
+                : 'border-white/20 focus:border-yellow-400'
+            }`}
+            disabled={loading}
+            tabIndex={isRegister ? 0 : -1}
+          />
 
           {/* Password Error Message */}
           {passwordError && (
