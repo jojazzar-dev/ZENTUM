@@ -5,6 +5,7 @@ import { AuthService } from '../services/authService';
 const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
   const navigate = useNavigate();
   const nameInputRef = useRef<HTMLInputElement>(null);
+  const emailInputRef = useRef<HTMLInputElement>(null);
   
   const [isRegister, setIsRegister] = useState(false);
   const [email, setEmail] = useState('');
@@ -19,6 +20,10 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
     if (isRegister && nameInputRef.current) {
       setTimeout(() => {
         nameInputRef.current?.focus();
+      }, 0);
+    } else if (!isRegister && emailInputRef.current) {
+      setTimeout(() => {
+        emailInputRef.current?.focus();
       }, 0);
     }
   }, [isRegister]);
@@ -103,6 +108,7 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
             className="w-full bg-black/30 border border-white/20 px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 text-base"
             required 
             disabled={loading}
+            ref={emailInputRef}
           />
 
           {/* Password Field */}
