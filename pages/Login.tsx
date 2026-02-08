@@ -71,16 +71,23 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Name Field - Register Only */}
           {isRegister && (
-            <input 
-              type="text" 
-              placeholder="Full Name" 
-              value={name} 
-              onChange={e => setName(e.target.value)} 
-              className="w-full bg-black/30 border border-white/10 p-3.5 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20" 
-              required 
-              disabled={loading}
-              autoComplete="name"
-            />
+            <div className="relative">
+              <input 
+                key="name-input"
+                placeholder="Full Name" 
+                value={name} 
+                onChange={(e) => {
+                  console.log('Name changed to:', e.target.value);
+                  setName(e.target.value);
+                }} 
+                onInput={(e) => {
+                  console.log('Name input event:', (e.target as any).value);
+                }}
+                className="w-full bg-black/30 border border-white/10 px-4 py-3 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 text-base"
+                disabled={loading}
+                autoComplete="off"
+              />
+            </div>
           )}
 
           {/* Email Field */}
