@@ -69,17 +69,17 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Name Field - Register Only */}
-          <input 
-            type="text" 
-            placeholder="Full Name" 
-            value={name} 
-            onChange={e => setName(e.target.value)} 
-            className="w-full bg-black/30 border border-white/20 px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 text-base"
-            disabled={loading}
-            autoFocus={isRegister}
-            style={{ display: isRegister ? 'block' : 'none' }}
-          />
+          {/* Name Field - Register Only - Completely Removed from DOM when not needed */}
+          {isRegister && (
+            <input 
+              type="text" 
+              placeholder="Full Name" 
+              value={name} 
+              onChange={e => setName(e.target.value)} 
+              className="w-full bg-black/30 border border-white/20 px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 text-base"
+              disabled={loading}
+            />
+          )}
 
           {/* Email Field */}
           <input 
@@ -103,20 +103,21 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
             disabled={loading}
           />
 
-          {/* Confirm Password Field - Register Only */}
-          <input 
-            type="password" 
-            placeholder="Confirm Password" 
-            value={confirmPassword} 
-            onChange={e => setConfirmPassword(e.target.value)} 
-            className={`w-full bg-black/30 border px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none text-base ${
-              passwordError 
-                ? 'border-red-500 focus:border-red-500' 
-                : 'border-white/20 focus:border-yellow-400'
-            }`}
-            disabled={loading}
-            style={{ display: isRegister ? 'block' : 'none' }}
-          />
+          {/* Confirm Password Field - Register Only - Completely Removed from DOM when not needed */}
+          {isRegister && (
+            <input 
+              type="password" 
+              placeholder="Confirm Password" 
+              value={confirmPassword} 
+              onChange={e => setConfirmPassword(e.target.value)} 
+              className={`w-full bg-black/30 border px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none text-base ${
+                passwordError 
+                  ? 'border-red-500 focus:border-red-500' 
+                  : 'border-white/20 focus:border-yellow-400'
+              }`}
+              disabled={loading}
+            />
+          )}
 
           {/* Password Error Message */}
           {passwordError && (
