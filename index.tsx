@@ -7,6 +7,7 @@ import App from './App';
  * التي تعالج تجمد الشاشة وسهولة الكتابة في الموبايل
  */
 import './index.css'; 
+import './responsive.css'; // Minimal responsive fixes for mobile 
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {

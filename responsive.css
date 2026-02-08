@@ -1,73 +1,48 @@
-/* Responsive styles for Zentum project */
+/* Minimal responsive fixes - No scroll blocking */
+
+* {
+  box-sizing: border-box;
+}
+
+/* Allow natural scrolling on all devices */
+html {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
 
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f8f9fa;
 }
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 16px;
-}
-
-/* Make all images responsive */
-img {
+/* Fix input fields on mobile */
+input, 
+textarea,
+select {
   max-width: 100%;
-  height: auto;
+  font-size: 16px; /* Prevents zoom on iOS */
 }
 
-/* Responsive typography */
-h1, h2, h3, h4, h5, h6 {
-  word-break: break-word;
+/* Ensure buttons are touchable on mobile */
+button {
+  min-height: 44px;
+  min-width: 44px;
 }
 
-/* Responsive padding and margin for sections */
-section, .section {
-  padding: 16px 8px;
-}
-
-/* Responsive grid for cards or columns */
-.row, .grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-.col, .column {
-  flex: 1 1 300px;
-  min-width: 250px;
-}
-
-/* Media Queries for mobile */
+/* Mobile responsive helpers */
 @media (max-width: 768px) {
-  .container {
-    padding: 8px;
+  /* Reduce excessive padding on small screens */
+  .p-8, .px-8, .py-8 {
+    padding: 1rem !important;
   }
-  .row, .grid {
-    flex-direction: column;
-    gap: 8px;
+  
+  .p-10, .px-10, .py-10 {
+    padding: 1.25rem !important;
   }
-  section, .section {
-    padding: 8px 4px;
-  }
-  h1 {
-    font-size: 1.5rem;
-  }
-  h2 {
-    font-size: 1.2rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .container {
-    padding: 2px;
-  }
-  h1 {
-    font-size: 1.1rem;
-  }
-  h2 {
-    font-size: 1rem;
+  
+  /* Ensure text is readable */
+  h1, h2, h3, h4, h5, h6 {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
 }

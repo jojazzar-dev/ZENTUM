@@ -1,6 +1,4 @@
-import '../login-mobile-fix.css';
 import React, { useState } from 'react';
-
 import { useNavigate } from 'react-router-dom';
 import { AuthService } from '../services/authService';
 
@@ -10,12 +8,11 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  // const [loading, setLoading] = useState(false); // حالة التحميل
-  const loading = false; // تعطيل التحميل مؤقتًا
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // setLoading(true); // تعطيل التحميل مؤقتًا
+    setLoading(true);
 
     try {
       if (isRegister) {
@@ -44,13 +41,13 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
     } catch (err) {
       alert("An error occurred during authentication.");
     } finally {
-      // setLoading(false); // تعطيل التحميل مؤقتًا
+      setLoading(false);
     }
   };
 
   return (
-    <div className="h-screen bg-[#0b0e11] flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-[#1e2329] p-8 rounded-3xl border border-white/5 shadow-2xl">
+    <div className="min-h-screen bg-[#0b0e11] flex items-center justify-center p-4 py-12">
+      <div className="w-full max-w-md bg-[#1e2329] p-6 sm:p-8 rounded-3xl border border-white/5 shadow-2xl my-auto">
         <h2 className="text-3xl font-black text-white mb-6 text-center uppercase tracking-tighter">
           {isRegister ? 'Join Zentum' : 'Account Login'}
         </h2>
