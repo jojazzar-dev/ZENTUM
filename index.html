@@ -10,7 +10,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ZENTUM">
-    <link rel="apple-touch-icon" href="/logo192.png">
+    <link rel="apple-touch-icon" href="/logo.svg">
+    <link rel="icon" type="image/svg+xml" href="/logo.svg">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#181a20">
 
@@ -69,6 +70,58 @@
           display: none !important;
         }
       }
+
+      /* PWA Install Banner Styling */
+      .pwa-install-banner {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: #000;
+        padding: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 -4px 20px rgba(245, 158, 11, 0.3);
+        z-index: 9999;
+        animation: slideUp 0.5s ease;
+      }
+
+      @keyframes slideUp {
+        from {
+          transform: translateY(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .pwa-install-banner button {
+        background: #000;
+        color: #f59e0b;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 1px;
+      }
+
+      .pwa-install-banner button:hover {
+        background: #1a1a1a;
+      }
+
+      .pwa-install-banner .close-btn {
+        background: transparent;
+        color: #000;
+        padding: 5px 10px;
+        font-size: 20px;
+      }
     </style>
 
     <script type="importmap">
@@ -89,6 +142,92 @@
   </head>
   <body>
     <div id="root"></div>
+    
+    <!-- PWA Install Banner -->
+    <div id="pwa-install-banner" style="display: none;" class="pwa-install-banner">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+          <circle cx="20" cy="20" r="20" fill="#000"/>
+          <path d="M20 10L20 30M20 30L15 25M20 30L25 25" stroke="#f59e0b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div>
+          <div style="font-weight: 900; font-size: 14px; letter-spacing: 2px;">INSTALL ZENTUM APP</div>
+          <div style="font-size: 11px; opacity: 0.8;">Add to home screen for quick access</div>
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <button id="pwa-install-btn">Install</button>
+        <button class="close-btn" id="pwa-close-btn">&times;</button>
+      </div>
+    </div>
+
+    <script>
+      // Service Worker Registration
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('✅ Service Worker registered:', reg.scope))
+            .catch(err => console.log('❌ Service Worker registration failed:', err));
+        });
+      }
+
+      // PWA Install Prompt
+      let deferredPrompt;
+      const installBanner = document.getElementById('pwa-install-banner');
+      const installBtn = document.getElementById('pwa-install-btn');
+      const closeBtn = document.getElementById('pwa-close-btn');
+
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        
+        // Show banner after 2 seconds if not dismissed before
+        setTimeout(() => {
+          const dismissed = localStorage.getItem('pwa-install-dismissed');
+          if (!dismissed) {
+            installBanner.style.display = 'flex';
+          }
+        }, 2000);
+      });
+
+      installBtn.addEventListener('click', async () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          const { outcome } = await deferredPrompt.userChoice;
+          
+          if (outcome === 'accepted') {
+            console.log('✅ User accepted PWA install');
+          }
+          
+          deferredPrompt = null;
+          installBanner.style.display = 'none';
+        }
+      });
+
+      closeBtn.addEventListener('click', () => {
+        installBanner.style.display = 'none';
+        localStorage.setItem('pwa-install-dismissed', 'true');
+      });
+
+      // iOS Installation Instructions
+      const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+      if (isIOS && !navigator.standalone) {
+        setTimeout(() => {
+          const dismissed = localStorage.getItem('pwa-install-dismissed');
+          if (!dismissed) {
+            installBanner.querySelector('div > div:last-child').textContent = 
+              'Tap Share → Add to Home Screen';
+            installBanner.style.display = 'flex';
+            installBtn.textContent = 'Got it';
+            installBtn.onclick = () => {
+              installBanner.style.display = 'none';
+              localStorage.setItem('pwa-install-dismissed', 'true');
+            };
+          }
+        }, 2000);
+      }
+    </script>
+
     <script type="module" src="/index.tsx"></script>
   </body>
 </html>

@@ -1,0 +1,18 @@
+<svg width="192" height="192" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="192" height="192" rx="42" fill="#0b0e11"/>
+  
+  <!-- Lightning Bolt (ZENTUM Logo) -->
+  <path d="M96 36L70 96H96L70 156L122 96H96L122 36H96Z" fill="url(#gradient)" stroke="#f59e0b" stroke-width="4"/>
+  
+  <!-- Gradient Definition -->
+  <defs>
+    <linearGradient id="gradient" x1="70" y1="36" x2="122" y2="156" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- ZENTUM Text -->
+  <text x="96" y="175" font-family="Arial, sans-serif" font-size="18" font-weight="900" text-anchor="middle" fill="#f59e0b" letter-spacing="2">ZENTUM</text>
+</svg>
