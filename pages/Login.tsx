@@ -69,8 +69,8 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Name Field - Always in DOM but hidden during login */}
-          <div className={isRegister ? "block" : "hidden"}>
+          {/* Name Field - Always in DOM but collapsed when not needed */}
+          <div className={`overflow-hidden transition-all ${isRegister ? 'max-h-20' : 'max-h-0'}`}>
             <input 
               type="text" 
               placeholder="Full Name" 
@@ -103,8 +103,8 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
             disabled={loading}
           />
 
-          {/* Confirm Password Field - Always in DOM but hidden during login */}
-          <div className={isRegister ? "block" : "hidden"}>
+          {/* Confirm Password Field - Always in DOM but collapsed when not needed */}
+          <div className={`overflow-hidden transition-all ${isRegister ? 'max-h-20' : 'max-h-0'}`}>
             <input 
               type="password" 
               placeholder="Confirm Password" 
