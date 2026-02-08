@@ -149,14 +149,9 @@ const Home: React.FC<HomeProps> = ({ user, onLogout }) => {
         {/* Hero Content */}
         <div className="text-center mb-20 md:mb-40 space-y-10 md:space-y-14 animate-in fade-in slide-in-from-bottom duration-1000">
           {/* ZENTUM Header */}
-          <div className="space-y-4">
-            <p className="text-yellow-500 text-sm md:text-lg font-black uppercase tracking-[0.3em] opacity-80">
-              Welcome to
-            </p>
-            <h2 className="text-3xl sm:text-5xl md:text-8xl font-black uppercase italic tracking-tighter text-white drop-shadow-lg">
-              ZENTUM
-            </h2>
-          </div>
+          <h2 className="text-5xl sm:text-7xl md:text-9xl font-black uppercase italic tracking-tighter text-white drop-shadow-lg">
+            ZENTUM
+          </h2>
 
           <h1 className="text-4xl sm:text-6xl md:text-9xl font-black bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-gray-700 leading-[1.1] uppercase italic tracking-tighter">
             The Future <br className="hidden md:block" /> Of Trading <br /> Is Stealth.
