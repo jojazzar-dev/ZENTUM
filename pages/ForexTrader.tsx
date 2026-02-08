@@ -211,18 +211,37 @@ const ForexTrader: React.FC<ForexProps> = ({ user, onUpdateBalance, onSyncUserDa
   return (
     <div className="h-screen flex flex-col bg-[#0b0e11] text-[#d1d4dc] text-[11px] overflow-hidden font-sans">
       
-      {/* --- [A] NAVBAR: CLEAN & MINIMAL --- */}
-      <nav className="h-14 border-b border-white/5 bg-[#181a20] flex items-center justify-between px-4 z-[100] shadow-lg shrink-0">
+      {/* --- [A] NAVBAR: RESPONSIVE --- */}
+      <nav className="h-14 md:h-16 border-b border-white/5 bg-[#181a20] flex items-center justify-between px-4 z-[100] shadow-lg shrink-0">
         
-        {/* جهة اليسار: Logo صغير فقط */}
-        <div className="flex items-center gap-3">
+        {/* Mobile: Logo صغير فقط */}
+        <div className="flex md:hidden items-center gap-3">
           <div className="flex items-center gap-2 cursor-pointer group" onClick={() => navigate('/')}>
             <Logo className="w-5 h-5 group-hover:rotate-12 transition-transform" />
           </div>
         </div>
 
-        {/* جهة الوسط: Home + Account */}
-        <div className="flex items-center gap-6">
+        {/* Desktop: Logo + Text */}
+        <div className="hidden md:flex items-center gap-4">
+          <div className="flex items-center gap-2 cursor-pointer group" onClick={() => navigate('/')}>
+            <Logo className="w-8 h-8 group-hover:rotate-12 transition-transform" />
+            <span className="font-black text-white uppercase text-lg tracking-tighter italic">ZENTUM</span>
+          </div>
+          
+          <div className="flex items-center gap-8">
+            <button onClick={() => navigate('/')} className="text-gray-400 hover:text-white transition-all uppercase font-black text-[13px] tracking-widest flex items-center gap-2">
+              <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              Home
+            </button>
+            <button onClick={() => setIsAccountOpen(true)} className="text-gray-400 hover:text-white transition-all uppercase font-black text-[13px] tracking-widest flex items-center gap-2">
+              <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              Account
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile: Home + Account في الوسط */}
+        <div className="flex md:hidden items-center gap-6">
           <button 
             onClick={() => navigate('/')} 
             className="text-gray-400 hover:text-white transition-all uppercase font-black text-[11px] tracking-widest flex items-center gap-1.5"
@@ -243,12 +262,26 @@ const ForexTrader: React.FC<ForexProps> = ({ user, onUpdateBalance, onSyncUserDa
           </button>
         </div>
 
-        {/* جهة اليمين: Balance فقط */}
-        <div className="flex items-center gap-3">
+        {/* Mobile: Balance فقط */}
+        <div className="flex md:hidden items-center gap-3">
           <div className="bg-black/20 px-3 py-1 rounded-lg border border-white/10 flex flex-col items-end">
             <span className="text-gray-500 text-[7px] tracking-widest font-black uppercase leading-none">Balance</span>
             <span className="text-white font-mono text-[10px] font-black">${user.forexBalance.toFixed(2)}</span>
           </div>
+        </div>
+
+        {/* Desktop: Equity + Balance */}
+        <div className="hidden md:flex gap-6 items-center">
+           <div className="bg-black/40 px-3 py-1.5 rounded-2xl border border-white/5 font-bold uppercase flex items-center gap-4 shadow-inner">
+              <div className="flex flex-col items-end border-r border-white/10 pr-6">
+                <span className="text-gray-600 text-[8px] tracking-widest font-black uppercase">Equity</span>
+                <span className={`font-mono text-[14px] font-black ${totalPL >= 0 ? 'text-green-500' : 'text-red-500'}`}>${equity.toFixed(2)}</span>
+              </div>
+              <div className="flex flex-col items-end">
+                <span className="text-gray-600 text-[8px] tracking-widest font-black uppercase">Balance</span>
+                <span className="text-white font-mono text-[14px] font-black">${user.forexBalance.toFixed(2)}</span>
+              </div>
+           </div>
         </div>
       </nav>
 
@@ -312,14 +345,25 @@ const ForexTrader: React.FC<ForexProps> = ({ user, onUpdateBalance, onSyncUserDa
           </div>
 
           {/* Main Display Area - Chart / Active Positions / History */}
-          <div className="flex-1 bg-black relative shadow-inner overflow-hidden">
-            {/* Chart View */}
-            {viewMode === 'chart' && (
+          <div className="flex-1 flex flex-col bg-black relative shadow-inner overflow-hidden">
+            {/* Desktop: Chart always visible */}
+            <div className="hidden md:flex md:flex-1 bg-black relative shadow-inner">
               <iframe 
                 src={`https://s.tradingview.com/widgetembed/?symbol=${selected === 'XAUUSD' ? 'OANDA:XAUUSD' : selected === 'NAS100' ? 'CAPITALCOM:US100' : 'FX_IDC:' + selected}&interval=1&theme=dark&style=1&locale=en&enable_publishing=false&hide_top_toolbar=false&allow_symbol_change=false`} 
                 className="w-full h-full border-none" 
                 title="Forex Live Feed"
               />
+            </div>
+
+            {/* Mobile: Chart View */}
+            {viewMode === 'chart' && (
+              <div className="md:hidden flex-1 bg-black relative shadow-inner">
+                <iframe 
+                  src={`https://s.tradingview.com/widgetembed/?symbol=${selected === 'XAUUSD' ? 'OANDA:XAUUSD' : selected === 'NAS100' ? 'CAPITALCOM:US100' : 'FX_IDC:' + selected}&interval=1&theme=dark&style=1&locale=en&enable_publishing=false&hide_top_toolbar=false&allow_symbol_change=false`} 
+                  className="w-full h-full border-none" 
+                  title="Forex Live Feed"
+                />
+              </div>
             )}
 
             {/* Active Positions View */}
@@ -393,8 +437,63 @@ const ForexTrader: React.FC<ForexProps> = ({ user, onUpdateBalance, onSyncUserDa
             )}
           </div>
 
-          {/* Control Buttons - Chart / Active / History */}
-          <div className="bg-[#181a20] border-t border-[#2b2f36] flex gap-2 p-2 shrink-0 shadow-lg">
+          {/* Desktop: Bottom Terminal Panel (Always visible) */}
+          <div className="hidden md:flex md:h-64 bg-[#181a20] border-t border-[#2b2f36] flex-col overflow-hidden shrink-0 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
+            <div className="flex bg-[#0b0e11] text-[9px] text-gray-500 border-b border-[#2b2f36] font-black uppercase tracking-widest">
+               <button onClick={() => setViewMode('active')} className={`px-12 py-4 border-r border-[#2b2f36] transition-all ${viewMode === 'active' ? 'bg-[#1e2329] text-blue-500 font-black' : 'hover:text-white'}`}>Active Positions</button>
+               <button onClick={() => setViewMode('history')} className={`px-12 py-4 border-r border-[#2b2f36] transition-all ${viewMode === 'history' ? 'bg-[#1e2329] text-blue-500 font-black' : 'hover:text-white'}`}>Account History</button>
+            </div>
+
+            <div className="p-2.5 bg-[#0b0e11] border-b border-[#2b2f36] flex gap-10 text-[11px] text-gray-400 font-bold uppercase overflow-x-auto whitespace-nowrap custom-scrollbar">
+               <div className="flex gap-2 text-white">Balance: <span className="text-white font-mono">${user.forexBalance.toFixed(2)}</span></div>
+               <div className="flex gap-2">Equity: <span className={`font-mono ${totalPL >= 0 ? 'text-green-500' : 'text-red-500'}`}>${equity.toFixed(2)}</span></div>
+               <div className="flex gap-2">Used Margin: <span className="text-white font-mono">${margin.toFixed(2)}</span></div>
+               <div className="flex gap-2 text-white">Free: <span className={`font-mono ${freeMargin < 0 ? 'text-red-500' : 'text-green-400'}`}>${freeMargin.toFixed(2)}</span></div>
+               <div className="flex gap-2">Margin Level: <span className="text-white font-mono">{marginLevel.toFixed(2)}%</span></div>
+            </div>
+
+            <div className="flex-1 overflow-auto custom-scrollbar bg-[#181a20] p-4">
+               <table className="w-full text-left text-white text-[11px] border-collapse">
+                <thead className="text-gray-600 border-b border-white/5 sticky top-0 bg-[#181a20] z-10 font-black uppercase tracking-widest text-[9px]">
+                  <tr><th className="pb-3 pr-2">Symbol</th><th>Type</th><th className="text-center">Volume</th><th className="text-center">Profit</th><th className="text-right pb-3">Action</th></tr>
+                </thead>
+                <tbody className="divide-y divide-white/[0.03]">
+                  {viewMode === 'active' ? (
+                    orders.map((o: any) => {
+                      const pl = calculatePL(o);
+                      return (
+                        <tr key={o.id} className="hover:bg-white/[0.02] transition-colors group">
+                          <td className="py-4 font-black uppercase text-xs tracking-tighter">{o.symbol}</td>
+                          <td className={`py-4 font-black ${o.type === 'BUY' ? 'text-blue-400' : 'text-red-400'}`}>{o.type}</td>
+                          <td className="py-4 text-center font-mono font-black text-gray-400 text-sm">{o.volume.toFixed(2)}</td>
+                          <td className={`py-4 text-center font-black font-mono text-[16px] ${pl >= 0 ? 'text-green-500' : 'text-red-400'}`}>{pl.toFixed(2)}</td>
+                          <td className="py-4 text-right">
+                            <button onClick={() => closeOrder(o.id)} className="bg-red-500/10 text-red-500 hover:bg-red-600 hover:text-white px-3 py-1 rounded-lg font-black text-[9px] uppercase border border-red-500/20 transition-all active:scale-95">Close</button>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  ) : (
+                    history.filter((h: any) => h.marketType === MarketType.FOREX).map((h: any) => (
+                      <tr key={h.id} className="border-b border-white/[0.02] opacity-60">
+                        <td className="py-4 font-black uppercase text-xs">{h.symbol}</td>
+                        <td className={`py-4 font-black ${h.type === 'BUY' ? 'text-blue-400' : 'text-red-400'}`}>{h.type}</td>
+                        <td className="py-4 text-center font-mono">{h.volume.toFixed(2)}</td>
+                        <td className={`py-4 text-center font-black font-mono text-[14px] ${h.profit >= 0 ? 'text-green-500' : 'text-red-400'}`}>{h.profit.toFixed(2)}</td>
+                        <td className="text-right p-3 text-gray-600 font-mono italic text-[9px]">{new Date(h.timestamp).toLocaleDateString()}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+               </table>
+               {(viewMode === 'active' ? orders : history).length === 0 && (
+                 <div className="p-16 text-center text-gray-700 font-black uppercase tracking-[0.4em] italic opacity-30">No Database Record Found</div>
+               )}
+            </div>
+          </div>
+
+          {/* Mobile: Control Buttons - Chart / Active / History */}
+          <div className="md:hidden bg-[#181a20] border-t border-[#2b2f36] flex gap-2 p-2 shrink-0 shadow-lg">
             <button 
               onClick={() => setViewMode('chart')}
               className={`flex-1 px-4 py-3 rounded-lg font-black uppercase text-[10px] tracking-widest transition-all ${viewMode === 'chart' ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/40' : 'bg-black/30 text-gray-400 hover:text-white border border-white/10'}`}
