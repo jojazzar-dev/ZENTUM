@@ -7,15 +7,31 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
   const [isRegister, setIsRegister] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setPasswordError('');
     setLoading(true);
 
     try {
       if (isRegister) {
+        // التحقق من تطابق كلمات المرور
+        if (password !== confirmPassword) {
+          setPasswordError('❌ كلمات المرور غير متطابقة');
+          setLoading(false);
+          return;
+        }
+        
+        if (password.length < 6) {
+          setPasswordError('❌ كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+          setLoading(false);
+          return;
+        }
+
         // تسجيل حساب جديد سحابياً
         const res = await AuthService.register(email, password, name);
         if (res.success) {
@@ -53,50 +69,98 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Name Field - Register Only */}
           {isRegister && (
             <input 
               type="text" 
               placeholder="Full Name" 
               value={name} 
               onChange={e => setName(e.target.value)} 
-              className="w-full bg-black/30 border border-white/10 p-3.5 rounded-xl text-white outline-none focus:border-yellow-500" 
+              className="w-full bg-black/30 border border-white/10 p-3.5 rounded-xl text-white outline-none focus:border-yellow-500 text-base pointer-events-auto" 
               required 
+              disabled={loading}
             />
           )}
 
+          {/* Email Field */}
           <input 
             type="email" 
             placeholder="Email Address" 
             value={email} 
             onChange={e => setEmail(e.target.value)} 
-            className="w-full bg-black/30 border border-white/10 p-3.5 rounded-xl text-white outline-none focus:border-yellow-500" 
+            className="w-full bg-black/30 border border-white/10 p-3.5 rounded-xl text-white outline-none focus:border-yellow-500 text-base pointer-events-auto" 
             required 
+            disabled={loading}
           />
 
+          {/* Password Field */}
           <input 
             type="password" 
             placeholder="Password" 
             value={password} 
             onChange={e => setPassword(e.target.value)} 
-            className="w-full bg-black/30 border border-white/10 p-3.5 rounded-xl text-white outline-none focus:border-yellow-500" 
+            className="w-full bg-black/30 border border-white/10 p-3.5 rounded-xl text-white outline-none focus:border-yellow-500 text-base pointer-events-auto" 
             required 
+            disabled={loading}
           />
-          
+
+          {/* Confirm Password Field - Register Only */}
+          {isRegister && (
+            <input 
+              type="password" 
+              placeholder="Confirm Password" 
+              value={confirmPassword} 
+              onChange={e => setConfirmPassword(e.target.value)} 
+              className={`w-full bg-black/30 border p-3.5 rounded-xl text-white outline-none text-base pointer-events-auto transition-all ${
+                passwordError 
+                  ? 'border-red-500 focus:border-red-500' 
+                  : 'border-white/10 focus:border-yellow-500'
+              }`}
+              required 
+              disabled={loading}
+            />
+          )}
+
+          {/* Password Error Message */}
+          {passwordError && (
+            <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3 text-red-400 text-sm font-bold text-center">
+              {passwordError}
+            </div>
+          )}
+
+          {/* Submit Button */}
           <button 
             type="submit" 
             disabled={loading}
-            className={`w-full bg-yellow-600 hover:bg-yellow-500 text-black font-black py-4 rounded-xl transition-all uppercase tracking-widest mt-4 shadow-lg active:scale-95 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`w-full bg-yellow-600 hover:bg-yellow-500 text-black font-black py-4 rounded-xl transition-all uppercase tracking-widest mt-6 shadow-lg active:scale-95 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             {loading ? 'Processing...' : (isRegister ? 'Create Account' : 'Sign In')}
           </button>
+
+          {/* Forgot Password Link - Login Only */}
+          {!isRegister && (
+            <button 
+              type="button"
+              onClick={() => alert('📧 ستتلقى بريداً إلكترونياً الرابط لإعادة تعيين كلمة المرور (قريباً)')}
+              className="w-full text-center text-yellow-500 hover:text-yellow-400 text-sm font-black uppercase tracking-widest transition-all"
+            >
+              Forgot Password?
+            </button>
+          )}
         </form>
 
+        {/* Toggle Register/Login */}
         <div className="text-gray-500 text-center mt-8 text-xs font-medium">
           {isRegister ? 'Already have an account?' : "Don't have an account?"}
           <button 
             type="button"
-            onClick={() => setIsRegister(!isRegister)} 
-            className="text-yellow-500 ml-2 font-black hover:underline transition-all"
+            onClick={() => {
+              setIsRegister(!isRegister);
+              setPasswordError('');
+              setConfirmPassword('');
+            }}
+            disabled={loading}
+            className="text-yellow-500 ml-2 font-black hover:underline transition-all disabled:opacity-50"
           >
             {isRegister ? 'Login here' : 'Register here'}
           </button>
