@@ -69,8 +69,8 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Name Field - Register Only */}
-          {isRegister && (
+          {/* Name Field - Always in DOM but hidden during login */}
+          <div className={isRegister ? "block" : "hidden"}>
             <input 
               type="text" 
               placeholder="Full Name" 
@@ -78,11 +78,8 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
               onChange={e => setName(e.target.value)} 
               className="w-full bg-black/30 border border-white/20 px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 text-base"
               disabled={loading}
-              inputMode="text"
-              autoCorrect="off"
-              spellCheck="false"
             />
-          )}
+          </div>
 
           {/* Email Field */}
           <input 
@@ -93,8 +90,6 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
             className="w-full bg-black/30 border border-white/20 px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 text-base"
             required 
             disabled={loading}
-            inputMode="email"
-            autoCorrect="off"
           />
 
           {/* Password Field */}
@@ -106,11 +101,10 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
             className="w-full bg-black/30 border border-white/20 px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 text-base"
             required 
             disabled={loading}
-            autoCorrect="off"
           />
 
-          {/* Confirm Password Field - Register Only */}
-          {isRegister && (
+          {/* Confirm Password Field - Always in DOM but hidden during login */}
+          <div className={isRegister ? "block" : "hidden"}>
             <input 
               type="password" 
               placeholder="Confirm Password" 
@@ -121,11 +115,9 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
                   ? 'border-red-500 focus:border-red-500' 
                   : 'border-white/20 focus:border-yellow-400'
               }`}
-              required 
               disabled={loading}
-              autoCorrect="off"
             />
-          )}
+          </div>
 
           {/* Password Error Message */}
           {passwordError && (
