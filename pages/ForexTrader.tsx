@@ -251,17 +251,6 @@ const ForexTrader: React.FC<ForexProps> = ({ user, onUpdateBalance, onSyncUserDa
           </div>
         </div>
       </nav>
-           
-           <div className="flex gap-1.5 sm:gap-2.5">
-             <button onClick={() => setIsDepositOpen(true)} className="bg-blue-600 text-white px-3 sm:px-7 py-1.5 sm:py-3 rounded-xl font-black text-[9px] sm:text-[12px] uppercase shadow-lg shadow-blue-900/40 hover:bg-blue-500 transition-all active:scale-95">Add</button>
-             <button onClick={() => setIsWithdrawOpen(true)} className="border border-white/20 text-white px-3 sm:px-7 py-1.5 sm:py-3 rounded-xl font-black text-[9px] sm:text-[12px] uppercase hover:bg-white/10 active:scale-95 transition-all">Withdraw</button>
-           </div>
-
-           <button onClick={onLogout} className="text-gray-500 hover:text-red-500 ml-1 sm:ml-3 p-1 transition-colors">
-             <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" strokeLinecap="round" strokeLinejoin="round"/></svg>
-           </button>
-        </div>
-      </nav>
 
       <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
         
