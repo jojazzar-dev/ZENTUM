@@ -76,14 +76,11 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
               placeholder="Full Name" 
               value={name} 
               onChange={e => setName(e.target.value)} 
-              className="w-full bg-black/30 border border-white/10 px-4 py-3 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 text-lg md:text-base" 
+              className="w-full bg-black/30 border border-white/20 px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 text-base"
               disabled={loading}
-              style={{
-                WebkitAppearance: 'none',
-                WebkitUserSelect: 'text',
-                touchAction: 'manipulation',
-                fontSize: '16px'
-              }}
+              inputMode="text"
+              autoCorrect="off"
+              spellCheck="false"
             />
           )}
 
@@ -93,15 +90,11 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
             placeholder="Email Address" 
             value={email} 
             onChange={e => setEmail(e.target.value)} 
-            className="w-full bg-black/30 border border-white/10 px-4 py-3 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 text-lg md:text-base" 
+            className="w-full bg-black/30 border border-white/20 px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 text-base"
             required 
             disabled={loading}
-            style={{
-              WebkitAppearance: 'none',
-              WebkitUserSelect: 'text',
-              touchAction: 'manipulation',
-              fontSize: '16px'
-            }}
+            inputMode="email"
+            autoCorrect="off"
           />
 
           {/* Password Field */}
@@ -110,15 +103,10 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
             placeholder="Password" 
             value={password} 
             onChange={e => setPassword(e.target.value)} 
-            className="w-full bg-black/30 border border-white/10 px-4 py-3 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 text-lg md:text-base" 
+            className="w-full bg-black/30 border border-white/20 px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 text-base"
             required 
             disabled={loading}
-            style={{
-              WebkitAppearance: 'none',
-              WebkitUserSelect: 'text',
-              touchAction: 'manipulation',
-              fontSize: '16px'
-            }}
+            autoCorrect="off"
           />
 
           {/* Confirm Password Field - Register Only */}
@@ -128,19 +116,14 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
               placeholder="Confirm Password" 
               value={confirmPassword} 
               onChange={e => setConfirmPassword(e.target.value)} 
-              className={`w-full bg-black/30 border px-4 py-3 rounded-xl text-white placeholder-gray-400 focus:outline-none transition-all text-lg md:text-base ${
+              className={`w-full bg-black/30 border px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none text-base ${
                 passwordError 
-                  ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500' 
-                  : 'border-white/10 focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500'
+                  ? 'border-red-500 focus:border-red-500' 
+                  : 'border-white/20 focus:border-yellow-400'
               }`}
               required 
               disabled={loading}
-              style={{
-                WebkitAppearance: 'none',
-                WebkitUserSelect: 'text',
-                touchAction: 'manipulation',
-                fontSize: '16px'
-              }}
+              autoCorrect="off"
             />
           )}
 
