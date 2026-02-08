@@ -69,19 +69,17 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Name Field - Always in DOM using opacity */}
+          {/* Name Field - Register Only */}
           <input 
             type="text" 
             placeholder="Full Name" 
             value={name} 
             onChange={e => setName(e.target.value)} 
-            className={`w-full bg-black/30 border border-white/20 px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 text-base transition-all ${
-              isRegister 
-                ? 'opacity-100 pointer-events-auto' 
-                : 'opacity-0 pointer-events-none absolute'
+            className={`w-full bg-black/30 border border-white/20 px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 text-base transition-opacity duration-200 ${
+              isRegister ? 'block opacity-100' : 'hidden opacity-0'
             }`}
-            disabled={loading}
-            tabIndex={isRegister ? 0 : -1}
+            disabled={loading || !isRegister}
+            style={{ display: isRegister ? 'block' : 'none' }}
           />
 
           {/* Email Field */}
@@ -106,23 +104,21 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
             disabled={loading}
           />
 
-          {/* Confirm Password Field - Always in DOM using opacity */}
+          {/* Confirm Password Field - Register Only */}
           <input 
             type="password" 
             placeholder="Confirm Password" 
             value={confirmPassword} 
             onChange={e => setConfirmPassword(e.target.value)} 
-            className={`w-full bg-black/30 border px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none text-base transition-all ${
-              isRegister 
-                ? 'opacity-100 pointer-events-auto' 
-                : 'opacity-0 pointer-events-none absolute'
+            className={`w-full bg-black/30 border px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none text-base transition-opacity duration-200 ${
+              isRegister ? 'block opacity-100' : 'hidden opacity-0'
             } ${
               passwordError 
                 ? 'border-red-500 focus:border-red-500' 
                 : 'border-white/20 focus:border-yellow-400'
             }`}
-            disabled={loading}
-            tabIndex={isRegister ? 0 : -1}
+            disabled={loading || !isRegister}
+            style={{ display: isRegister ? 'block' : 'none' }}
           />
 
           {/* Password Error Message */}
