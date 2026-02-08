@@ -72,42 +72,42 @@ const Home: React.FC<HomeProps> = ({ user, onLogout }) => {
   return (
     <div className="min-h-screen flex flex-col bg-[#0b0e11] text-white font-sans selection:bg-yellow-500/30 overflow-x-hidden">
       
-      {/* --- [A] NAVBAR: RESPONSIVE HEADER --- */}
-      <nav className="p-4 md:p-8 flex justify-between items-center border-b border-white/5 bg-[#181a20]/80 backdrop-blur-2xl sticky top-0 z-[100] shadow-2xl shrink-0">
+      {/* --- [A] NAVBAR: CLEAN & MINIMAL --- */}
+      <nav className="p-3 md:p-4 flex justify-between items-center border-b border-white/5 bg-[#181a20]/80 backdrop-blur-2xl sticky top-0 z-[100] shadow-lg shrink-0">
         
-        {/* جهة اليسار: Logo + Home + Account (خط كبير وعريض كما في صفحات التداول) */}
-        <div className="flex items-center gap-6 md:gap-12">
+        {/* جهة اليسار: Logo صغير */}
+        <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 cursor-pointer group" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>
-            <Logo className="w-10 h-10 md:w-16 md:h-16 group-hover:rotate-12 transition-transform" />
-            <div className="flex flex-col">
-              <span className="text-xl md:text-3xl font-black tracking-tighter uppercase italic leading-none">{APP_NAME}</span>
-              <span className="text-[7px] md:text-[10px] text-yellow-500 font-black uppercase tracking-[0.4em] mt-1 opacity-80">Terminal</span>
-            </div>
+            <Logo className="w-5 h-5 md:w-6 md:h-6 group-hover:rotate-12 transition-transform" />
           </div>
-          
-          {/* أزرار التنقل الجديدة - متطابقة مع المتطلبات */}
-          {user && (
-            <div className="flex items-center gap-4 md:gap-8 border-l border-white/10 pl-6 md:pl-10">
-              <button 
-                onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}
-                className="text-white transition-all uppercase font-black text-[12px] md:text-[14px] tracking-widest flex items-center gap-2"
-              >
-                <svg className="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                Home
-              </button>
-              <button 
-                onClick={() => setIsAccountOpen(true)}
-                className="text-gray-400 hover:text-white transition-all uppercase font-black text-[12px] md:text-[14px] tracking-widest flex items-center gap-2"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                Account
-              </button>
-            </div>
-          )}
         </div>
+
+        {/* جهة الوسط: Home + Account */}
+        {user && (
+          <div className="flex items-center gap-6">
+            <button 
+              onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}
+              className="text-gray-400 hover:text-white transition-all uppercase font-black text-[11px] md:text-[12px] tracking-widest flex items-center gap-1.5"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              Home
+            </button>
+            <button 
+              onClick={() => setIsAccountOpen(true)}
+              className="text-gray-400 hover:text-white transition-all uppercase font-black text-[11px] md:text-[12px] tracking-widest flex items-center gap-1.5"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              Account
+            </button>
+          </div>
+        )}
         
-        {/* جهة اليمين: الدخول والخروج (متجاوب) */}
-        <div className="flex gap-3 md:gap-6 items-center">
+        {/* جهة اليمين: Login أو Logout */}
+        <div className="flex gap-3 md:gap-4 items-center">
           {user ? (
             <div className="flex items-center gap-3 md:gap-6">
               {/* إخفاء الإيميل في الموبايل لتوفير مساحة */}

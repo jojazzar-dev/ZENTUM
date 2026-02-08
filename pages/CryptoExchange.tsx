@@ -145,46 +145,44 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
   return (
     <div className="h-screen flex flex-col bg-[#0b0e11] text-white overflow-hidden font-sans select-none text-[11px]">
       
-      {/* --- [A] NAVBAR: TOP NAVIGATION & FINANCE --- */}
-      <nav className="h-16 border-b border-white/5 bg-[#181a20] flex items-center justify-between px-3 sm:px-6 z-[100] shadow-2xl shrink-0">
+      {/* --- [A] NAVBAR: CLEAN & MINIMAL --- */}
+      <nav className="h-14 border-b border-white/5 bg-[#181a20] flex items-center justify-between px-4 z-[100] shadow-lg shrink-0">
         
-        {/* جهة اليسار: Logo + Home + Account (خط كبير وعريض) */}
-        <div className="flex items-center gap-4 sm:gap-12">
+        {/* جهة اليسار: Logo صغير فقط */}
+        <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 cursor-pointer group" onClick={() => navigate('/')}>
-            <Logo className="w-8 h-8 sm:w-10 sm:h-10 group-hover:rotate-12 transition-transform" />
-            <span className="font-black text-white uppercase text-xs sm:text-lg tracking-tighter italic">ZENTUM</span>
-          </div>
-          
-          <div className="flex items-center gap-3 sm:gap-8">
-            <button onClick={() => navigate('/')} className="text-gray-400 hover:text-white transition-all uppercase font-black text-[11px] sm:text-[13px] tracking-widest flex items-center gap-2">
-              <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              Home
-            </button>
-            <button onClick={() => setIsAccountOpen(true)} className="text-gray-400 hover:text-white transition-all uppercase font-black text-[11px] sm:text-[13px] tracking-widest flex items-center gap-2">
-              <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              Account
-            </button>
+            <Logo className="w-5 h-5 group-hover:rotate-12 transition-transform" />
           </div>
         </div>
-        
-        {/* جهة اليمين: المالية والتحكم */}
-        <div className="flex items-center gap-2 sm:gap-5">
-          <div className="flex flex-col items-end mr-2 sm:mr-4 text-right">
-            <span className="text-[7px] sm:text-[9px] text-gray-600 uppercase font-black tracking-widest leading-none mb-1 uppercase">Available Balance</span>
-            <span className="text-[11px] sm:text-[16px] font-mono font-black text-yellow-500 tracking-tighter">
-              {user.cryptoBalance.toLocaleString(undefined, {minimumFractionDigits: 2})} 
-              <span className="text-[8px] text-gray-400 ml-1 uppercase">USDT</span>
-            </span>
-          </div>
 
-          <div className="flex items-center gap-1 sm:gap-2.5">
-            <button onClick={() => setIsDepositOpen(true)} className="bg-yellow-600 text-black px-3 sm:px-7 py-1.5 sm:py-3 rounded-xl font-black text-[9px] sm:text-[12px] uppercase shadow-lg shadow-yellow-900/30 hover:bg-yellow-500 transition-all active:scale-95">Deposit</button>
-            <button onClick={() => setIsWithdrawOpen(true)} className="border border-white/20 text-white px-3 sm:px-7 py-1.5 sm:py-3 rounded-xl font-black text-[9px] sm:text-[12px] uppercase hover:bg-white/10 active:scale-95 transition-all">Withdraw</button>
-          </div>
-          
-          <button onClick={onLogout} className="text-gray-500 hover:text-red-500 transition-colors ml-1 sm:ml-3 p-1">
-            <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        {/* جهة الوسط: Home + Account */}
+        <div className="flex items-center gap-6">
+          <button 
+            onClick={() => navigate('/')} 
+            className="text-gray-400 hover:text-white transition-all uppercase font-black text-[11px] tracking-widest flex items-center gap-1.5"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+              <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Home
           </button>
+          <button 
+            onClick={() => setIsAccountOpen(true)} 
+            className="text-gray-400 hover:text-white transition-all uppercase font-black text-[11px] tracking-widest flex items-center gap-1.5"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+              <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Account
+          </button>
+        </div>
+
+        {/* جهة اليمين: Balance فقط */}
+        <div className="flex items-center gap-3">
+          <div className="bg-black/20 px-3 py-1 rounded-lg border border-white/10 flex flex-col items-end">
+            <span className="text-gray-500 text-[7px] tracking-widest font-black uppercase leading-none">Balance</span>
+            <span className="text-yellow-500 font-mono text-[10px] font-black">{user.cryptoBalance.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+          </div>
         </div>
       </nav>
 

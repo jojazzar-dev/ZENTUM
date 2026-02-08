@@ -211,42 +211,46 @@ const ForexTrader: React.FC<ForexProps> = ({ user, onUpdateBalance, onSyncUserDa
   return (
     <div className="h-screen flex flex-col bg-[#0b0e11] text-[#d1d4dc] text-[11px] overflow-hidden font-sans">
       
-      {/* --- [A] NAVBAR: NAVIGATION LEFT, FINANCE RIGHT --- */}
-      <nav className="h-16 border-b border-white/5 bg-[#181a20] flex items-center justify-between px-4 z-[100] shadow-2xl shrink-0">
+      {/* --- [A] NAVBAR: CLEAN & MINIMAL --- */}
+      <nav className="h-14 border-b border-white/5 bg-[#181a20] flex items-center justify-between px-4 z-[100] shadow-lg shrink-0">
         
-        {/* جهة اليسار: Logo + Home + Account (خط كبير وعريض) */}
-        <div className="flex items-center gap-4 sm:gap-12">
+        {/* جهة اليسار: Logo صغير فقط */}
+        <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 cursor-pointer group" onClick={() => navigate('/')}>
-            <Logo className="w-8 h-8 group-hover:rotate-12 transition-transform" />
-            <span className="font-black text-white uppercase text-xs sm:text-lg tracking-tighter italic">ZENTUM</span>
-          </div>
-          
-          <div className="flex items-center gap-3 sm:gap-8">
-            <button onClick={() => navigate('/')} className="text-gray-400 hover:text-white transition-all uppercase font-black text-[11px] sm:text-[13px] tracking-widest flex items-center gap-2">
-              <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              Home
-            </button>
-            <button onClick={() => setIsAccountOpen(true)} className="text-gray-400 hover:text-white transition-all uppercase font-black text-[11px] sm:text-[13px] tracking-widest flex items-center gap-2">
-              <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              Account
-            </button>
+            <Logo className="w-5 h-5 group-hover:rotate-12 transition-transform" />
           </div>
         </div>
 
-        {/* جهة اليمين: المالية والتحكم */}
-        <div className="flex gap-2 sm:gap-6 items-center">
-           {/* مؤشر حالة السوق */}
-           <div className={`px-3 py-1.5 rounded-lg border font-bold uppercase flex items-center gap-2 text-[8px] sm:text-[10px] tracking-widest ${isMarketOpen() ? 'bg-green-600/20 border-green-500/30 text-green-400' : 'bg-red-600/20 border-red-500/30 text-red-400'}`}>
-             <span className={`w-2 h-2 rounded-full ${isMarketOpen() ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></span>
-             {isMarketOpen() ? 'MARKET OPEN' : 'MARKET CLOSED'}
-           </div>
-           
-           <div className="bg-black/40 px-3 py-1.5 rounded-2xl border border-white/5 font-bold uppercase flex items-center gap-2 sm:gap-4 shadow-inner">
-              <div className="flex flex-col items-end">
-                <span className="text-gray-600 text-[8px] tracking-widest font-black uppercase">Balance</span>
-                <span className="text-white font-mono text-[11px] sm:text-[14px] font-black">${user.forexBalance.toFixed(2)}</span>
-              </div>
-           </div>
+        {/* جهة الوسط: Home + Account */}
+        <div className="flex items-center gap-6">
+          <button 
+            onClick={() => navigate('/')} 
+            className="text-gray-400 hover:text-white transition-all uppercase font-black text-[11px] tracking-widest flex items-center gap-1.5"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+              <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Home
+          </button>
+          <button 
+            onClick={() => setIsAccountOpen(true)} 
+            className="text-gray-400 hover:text-white transition-all uppercase font-black text-[11px] tracking-widest flex items-center gap-1.5"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+              <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Account
+          </button>
+        </div>
+
+        {/* جهة اليمين: Balance فقط */}
+        <div className="flex items-center gap-3">
+          <div className="bg-black/20 px-3 py-1 rounded-lg border border-white/10 flex flex-col items-end">
+            <span className="text-gray-500 text-[7px] tracking-widest font-black uppercase leading-none">Balance</span>
+            <span className="text-white font-mono text-[10px] font-black">${user.forexBalance.toFixed(2)}</span>
+          </div>
+        </div>
+      </nav>
            
            <div className="flex gap-1.5 sm:gap-2.5">
              <button onClick={() => setIsDepositOpen(true)} className="bg-blue-600 text-white px-3 sm:px-7 py-1.5 sm:py-3 rounded-xl font-black text-[9px] sm:text-[12px] uppercase shadow-lg shadow-blue-900/40 hover:bg-blue-500 transition-all active:scale-95">Add</button>
