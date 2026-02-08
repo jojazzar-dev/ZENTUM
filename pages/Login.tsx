@@ -92,40 +92,55 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
 
           {/* Email Field */}
           <input 
+            key="email-input"
             type="email" 
             placeholder="Email Address" 
             value={email} 
-            onChange={e => setEmail(e.target.value)} 
-            className="w-full bg-black/30 border border-white/10 p-3.5 rounded-xl text-white outline-none focus:border-yellow-500 text-base pointer-events-auto" 
+            onChange={(e) => {
+              console.log('Email changed to:', e.target.value);
+              setEmail(e.target.value);
+            }} 
+            className="w-full bg-black/30 border border-white/10 px-4 py-3 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 text-base" 
             required 
             disabled={loading}
+            autoComplete="off"
           />
 
           {/* Password Field */}
           <input 
+            key="password-input"
             type="password" 
             placeholder="Password" 
             value={password} 
-            onChange={e => setPassword(e.target.value)} 
-            className="w-full bg-black/30 border border-white/10 p-3.5 rounded-xl text-white outline-none focus:border-yellow-500 text-base pointer-events-auto" 
+            onChange={(e) => {
+              console.log('Password changed');
+              setPassword(e.target.value);
+            }} 
+            className="w-full bg-black/30 border border-white/10 px-4 py-3 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 text-base" 
             required 
             disabled={loading}
+            autoComplete="off"
           />
 
           {/* Confirm Password Field - Register Only */}
           {isRegister && (
             <input 
+              key="confirm-password-input"
               type="password" 
               placeholder="Confirm Password" 
               value={confirmPassword} 
-              onChange={e => setConfirmPassword(e.target.value)} 
-              className={`w-full bg-black/30 border p-3.5 rounded-xl text-white outline-none text-base pointer-events-auto transition-all ${
+              onChange={(e) => {
+                console.log('Confirm password changed');
+                setConfirmPassword(e.target.value);
+              }} 
+              className={`w-full bg-black/30 border px-4 py-3 rounded-xl text-white placeholder-gray-400 focus:outline-none transition-all text-base ${
                 passwordError 
-                  ? 'border-red-500 focus:border-red-500' 
-                  : 'border-white/10 focus:border-yellow-500'
+                  ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500' 
+                  : 'border-white/10 focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500'
               }`}
               required 
               disabled={loading}
+              autoComplete="off"
             />
           )}
 
