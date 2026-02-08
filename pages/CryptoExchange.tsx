@@ -148,10 +148,11 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
       {/* --- [A] NAVBAR: RESPONSIVE --- */}
       <nav className="h-14 md:h-16 border-b border-white/5 bg-[#181a20] flex items-center justify-between px-4 z-[100] shadow-lg shrink-0">
         
-        {/* Mobile: Logo صغير فقط */}
-        <div className="flex md:hidden items-center gap-3">
-          <div className="flex items-center gap-2 cursor-pointer group" onClick={() => navigate('/')}>
-            <Logo className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+        {/* Mobile: Logo + ZENTUM */}
+        <div className="flex md:hidden items-center gap-2">
+          <div className="flex items-center gap-1.5 cursor-pointer group" onClick={() => navigate('/')}>
+            <Logo className="w-6 h-6 group-hover:rotate-12 transition-transform" />
+            <span className="font-black text-yellow-500 uppercase text-sm tracking-tighter italic">ZENTUM</span>
           </div>
         </div>
 
@@ -175,10 +176,10 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
         </div>
 
         {/* Mobile: Home + Account في الوسط */}
-        <div className="flex md:hidden items-center gap-6">
+        <div className="flex md:hidden items-center gap-4">
           <button 
             onClick={() => navigate('/')} 
-            className="text-gray-400 hover:text-white transition-all uppercase font-black text-[11px] tracking-widest flex items-center gap-1.5"
+            className="text-gray-400 hover:text-white transition-all uppercase font-black text-[10px] tracking-widest flex items-center gap-1"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
               <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" strokeLinecap="round" strokeLinejoin="round"/>
@@ -187,7 +188,7 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
           </button>
           <button 
             onClick={() => setIsAccountOpen(true)} 
-            className="text-gray-400 hover:text-white transition-all uppercase font-black text-[11px] tracking-widest flex items-center gap-1.5"
+            className="text-gray-400 hover:text-white transition-all uppercase font-black text-[10px] tracking-widest flex items-center gap-1"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
               <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" strokeLinecap="round" strokeLinejoin="round"/>

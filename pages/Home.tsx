@@ -75,10 +75,11 @@ const Home: React.FC<HomeProps> = ({ user, onLogout }) => {
       {/* --- [A] NAVBAR: CLEAN & MINIMAL --- */}
       <nav className="p-3 md:p-4 flex justify-between items-center border-b border-white/5 bg-[#181a20]/80 backdrop-blur-2xl sticky top-0 z-[100] shadow-lg shrink-0">
         
-        {/* جهة اليسار: Logo صغير */}
+        {/* جهة اليسار: Logo مع ZENTUM */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 cursor-pointer group" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>
-            <Logo className="w-5 h-5 md:w-6 md:h-6 group-hover:rotate-12 transition-transform" />
+          <div className="flex items-center gap-2 md:gap-3 cursor-pointer group" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>
+            <Logo className="w-7 h-7 md:w-10 md:h-10 group-hover:rotate-12 transition-transform" />
+            <span className="font-black text-yellow-500 uppercase text-lg md:text-2xl tracking-tighter italic">ZENTUM</span>
           </div>
         </div>
 
@@ -119,7 +120,7 @@ const Home: React.FC<HomeProps> = ({ user, onLogout }) => {
               {/* Dashboard button - إخفاء على الموبايل */}
               <button 
                 onClick={() => navigate(user.role === 'ADMIN' ? '/admin' : '/crypto')}
-                className="hidden md:block px-5 md:px-8 py-2.5 rounded-xl bg-yellow-600 text-black text-[10px] md:text-xs font-black uppercase shadow-xl shadow-yellow-900/20 hover:bg-yellow-500 transition-all active:scale-95"
+                className="hidden md:block px-5 md:px-12 py-2.5 md:py-4 rounded-xl bg-yellow-500 text-black text-[10px] md:text-base font-black uppercase shadow-xl shadow-yellow-900/40 hover:bg-yellow-400 transition-all active:scale-95"
               >
                 {user.role === 'ADMIN' ? 'Console' : 'Dashboard'}
               </button>
@@ -127,7 +128,7 @@ const Home: React.FC<HomeProps> = ({ user, onLogout }) => {
               {/* Logout button - إخفاء على الموبايل */}
               <button 
                 onClick={onLogout}
-                className="hidden md:block text-gray-500 hover:text-white uppercase font-black text-[10px] md:text-xs tracking-[0.2em] transition-colors"
+                className="hidden md:block text-gray-500 hover:text-yellow-500 uppercase font-black text-[10px] md:text-sm tracking-[0.2em] transition-colors"
               >
                 Logout
               </button>
@@ -135,7 +136,7 @@ const Home: React.FC<HomeProps> = ({ user, onLogout }) => {
           ) : (
             <button 
               onClick={() => navigate('/login')}
-              className="px-8 md:px-14 py-3 md:py-4 rounded-full bg-yellow-600 text-black font-black text-xs md:text-sm uppercase tracking-[0.2em] shadow-2xl active:scale-95 transition-all hover:bg-yellow-500"
+              className="px-8 md:px-16 py-3 md:py-5 rounded-full bg-yellow-500 text-black font-black text-xs md:text-lg uppercase tracking-[0.2em] shadow-2xl shadow-yellow-900/50 active:scale-95 transition-all hover:bg-yellow-400"
             >
               Get Started
             </button>
@@ -176,7 +177,7 @@ const Home: React.FC<HomeProps> = ({ user, onLogout }) => {
             {showInstallBtn && (
               <button 
                 onClick={handleInstallApp}
-                className="mt-8 px-10 md:px-16 py-5 md:py-7 bg-white text-black rounded-[2rem] font-black uppercase text-[10px] md:text-xs tracking-[0.3em] shadow-2xl flex items-center gap-4 mx-auto animate-bounce hover:scale-105 transition-all border-[6px] border-black"
+                className="mt-8 px-10 md:px-20 py-5 md:py-8 bg-yellow-500 text-black rounded-[2rem] font-black uppercase text-[10px] md:text-base tracking-[0.3em] shadow-2xl shadow-yellow-900/50 flex items-center gap-4 mx-auto animate-bounce hover:scale-105 transition-all hover:bg-yellow-400"
               >
                 <svg className="w-5 h-5 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" strokeLinecap="round" strokeLinejoin="round" /></svg>
                 Install Terminal App
@@ -251,27 +252,27 @@ const Home: React.FC<HomeProps> = ({ user, onLogout }) => {
             
             <button 
               onClick={() => handleDownload('Android')}
-              className="flex items-center gap-5 px-10 md:px-14 py-5 md:py-8 rounded-[2.5rem] bg-[#1e2329] border border-white/5 hover:border-white/20 transition-all group shadow-2xl active:scale-95"
+              className="flex items-center gap-5 px-10 md:px-16 py-5 md:py-10 rounded-[2.5rem] bg-yellow-500/10 border border-yellow-500/20 hover:border-yellow-500/50 hover:bg-yellow-500/20 transition-all group shadow-2xl active:scale-95"
             >
-              <div className="p-3 md:p-4 rounded-3xl bg-black group-hover:scale-110 transition-transform shadow-inner">
-                <svg className="w-7 h-7 md:w-10 md:h-10 text-green-500" fill="currentColor" viewBox="0 0 24 24"><path d="M17.523 15.341c-.551 0-1-.449-1-1 0-.551.449-1 1-1 .551 0 1 .449 1 1 0 .551-.449 1-1 1zm-11.046 0c-.551 0-1-.449-1-1 0-.551.449-1 1-1 .551 0 1 .449 1 1 0 .551-.449 1-1 1zm11.42-3.805l1.967-3.407a.5.5 0 10-.866-.5l-1.996 3.457A9.957 9.957 0 0012 10a9.957 9.957 0 00-7.002 1.086l-1.996-3.457a.5.5 0 10-.866.5l1.967 3.407A9.976 9.976 0 002 18h20a9.976 9.976 0 00-4.103-6.464z"/></svg>
+              <div className="p-3 md:p-5 rounded-3xl bg-black group-hover:scale-110 transition-transform shadow-inner">
+                <svg className="w-7 h-7 md:w-12 md:h-12 text-yellow-500" fill="currentColor" viewBox="0 0 24 24"><path d="M17.523 15.341c-.551 0-1-.449-1-1 0-.551.449-1 1-1 .551 0 1 .449 1 1 0 .551-.449 1-1 1zm-11.046 0c-.551 0-1-.449-1-1 0-.551.449-1 1-1 .551 0 1 .449 1 1 0 .551-.449 1-1 1zm11.42-3.805l1.967-3.407a.5.5 0 10-.866-.5l-1.996 3.457A9.957 9.957 0 0012 10a9.957 9.957 0 00-7.002 1.086l-1.996-3.457a.5.5 0 10-.866.5l1.967 3.407A9.976 9.976 0 002 18h20a9.976 9.976 0 00-4.103-6.464z"/></svg>
               </div>
               <div className="text-left">
-                <div className="text-[10px] md:text-xs text-gray-500 font-bold uppercase tracking-widest mb-1">Global Mobile OS</div>
-                <div className="font-black text-sm md:text-xl uppercase tracking-tighter">Android (APK)</div>
+                <div className="text-[10px] md:text-sm text-gray-500 font-bold uppercase tracking-widest mb-1">Global Mobile OS</div>
+                <div className="font-black text-sm md:text-2xl uppercase tracking-tighter text-yellow-500">Android (APK)</div>
               </div>
             </button>
 
             <button 
               onClick={() => handleDownload('iOS')}
-              className="flex items-center gap-5 px-10 md:px-14 py-5 md:py-8 rounded-[2.5rem] bg-[#1e2329] border border-white/5 hover:border-white/20 transition-all group shadow-2xl active:scale-95"
+              className="flex items-center gap-5 px-10 md:px-16 py-5 md:py-10 rounded-[2.5rem] bg-yellow-500/10 border border-yellow-500/20 hover:border-yellow-500/50 hover:bg-yellow-500/20 transition-all group shadow-2xl active:scale-95"
             >
-              <div className="p-3 md:p-4 rounded-3xl bg-black group-hover:scale-110 transition-transform shadow-inner">
-                <svg className="w-7 h-7 md:w-10 md:h-10 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.1 2.48-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .76-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+              <div className="p-3 md:p-5 rounded-3xl bg-black group-hover:scale-110 transition-transform shadow-inner">
+                <svg className="w-7 h-7 md:w-12 md:h-12 text-yellow-500" fill="currentColor" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.1 2.48-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .76-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
               </div>
               <div className="text-left">
-                <div className="text-[10px] md:text-xs text-gray-500 font-bold uppercase tracking-widest mb-1">Apple Mobile OS</div>
-                <div className="font-black text-sm md:text-xl uppercase tracking-tighter">iOS (iPhone)</div>
+                <div className="text-[10px] md:text-sm text-gray-500 font-bold uppercase tracking-widest mb-1">Apple Mobile OS</div>
+                <div className="font-black text-sm md:text-2xl uppercase tracking-tighter text-yellow-500">iOS (iPhone)</div>
               </div>
             </button>
             
