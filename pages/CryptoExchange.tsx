@@ -103,10 +103,14 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
       const assetIdx = holdings.findIndex(h => h.symbol === selected);
       if (assetIdx > -1) {
         const asset = holdings[assetIdx];
-        const gain = asset.qty * price; 
-        const netProfit = gain - (asset.qty * asset.buyPrice);
+        
+        // حساب صحيح: الربح = (السعر الحالي - سعر الشراء) × الكمية
+        const currentValue = asset.qty * price;  // القيمة الحالية للأصل
+        const costBasis = asset.qty * asset.buyPrice;  // تكلفة الشراء الأصلية
+        const netProfit = currentValue - costBasis;  // الربح أو الخسارة
 
-        const updatedCryptoBalance = user.cryptoBalance + gain;
+        // إضافة الربح فقط إلى الرصيد (ليس القيمة الكاملة)
+        const updatedCryptoBalance = user.cryptoBalance + netProfit;
 
         // إعداد سجل التاريخ للأرشفة
         const historyItem: HistoryOrder = {
@@ -124,7 +128,7 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
         const updatedHoldings = [...holdings];
         updatedHoldings.splice(assetIdx, 1);
         
-        // تحديث سحابي واحد وشامل (رصيد + أصول + سجل) يمنع مشكلة "القفز للخلف"
+        // تحديث سحابي واحد وشامل (رصيد + أصول + سجل)
         onSyncUserData({ 
           cryptoBalance: updatedCryptoBalance,
           cryptoHoldings: updatedHoldings, 
@@ -223,9 +227,9 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
                     min="0.01" 
                   />
                </div>
-               <div className="flex bg-[#1e2329] border border-white/10 rounded-2xl h-10 md:h-12 overflow-hidden shadow-2xl">
-                  <button onClick={() => handleTrade('SELL')} className="px-6 md:px-16 bg-red-600/20 text-red-500 border-r border-white/5 font-black uppercase text-[11px] md:text-[13px] hover:bg-red-600 hover:text-white transition-all tracking-widest active:scale-95">Sell</button>
-                  <button onClick={() => handleTrade('BUY')} className="px-6 md:px-16 bg-[#02c076]/20 text-[#02c076] font-black uppercase text-[11px] md:text-[13px] hover:bg-[#02c076] hover:text-white transition-all tracking-widest active:scale-95">Buy</button>
+               <div className="flex bg-[#1e2329] border border-white/10 rounded-2xl h-10 md:h-12 overflow-hidden shadow-2xl flex-1 md:flex-none">
+                  <button onClick={() => handleTrade('SELL')} className="flex-1 md:flex-none px-3 md:px-16 bg-red-600/20 text-red-500 border-r border-white/5 font-black uppercase text-[9px] md:text-[13px] hover:bg-red-600 hover:text-white transition-all tracking-widest active:scale-95">Sell</button>
+                  <button onClick={() => handleTrade('BUY')} className="flex-1 md:flex-none px-3 md:px-16 bg-[#02c076]/20 text-[#02c076] font-black uppercase text-[9px] md:text-[13px] hover:bg-[#02c076] hover:text-white transition-all tracking-widest active:scale-95">Buy</button>
                </div>
             </div>
           </div>

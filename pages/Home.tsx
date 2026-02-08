@@ -57,6 +57,18 @@ const Home: React.FC<HomeProps> = ({ user, onLogout }) => {
     alert(`Initializing ZENTUM ${platform} Core Download... The encrypted installer package will begin shortly.`);
   };
 
+  const handleDeposit = (type: 'forex' | 'crypto') => {
+    const page = type === 'forex' ? '/forex' : '/crypto';
+    navigate(page);
+    // يمكن إضافة modal للإيداع هنا لاحقاً
+  };
+
+  const handleWithdraw = (type: 'forex' | 'crypto') => {
+    const page = type === 'forex' ? '/forex' : '/crypto';
+    navigate(page);
+    // يمكن إضافة modal للسحب هنا لاحقاً
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-[#0b0e11] text-white font-sans selection:bg-yellow-500/30 overflow-x-hidden">
       
@@ -104,16 +116,18 @@ const Home: React.FC<HomeProps> = ({ user, onLogout }) => {
                 <span className="text-[11px] text-green-500 font-bold uppercase tracking-widest italic">Authorized</span>
               </div>
               
+              {/* Dashboard button - إخفاء على الموبايل */}
               <button 
                 onClick={() => navigate(user.role === 'ADMIN' ? '/admin' : '/crypto')}
-                className="px-5 md:px-8 py-2.5 rounded-xl bg-yellow-600 text-black text-[10px] md:text-xs font-black uppercase shadow-xl shadow-yellow-900/20 hover:bg-yellow-500 transition-all active:scale-95"
+                className="hidden md:block px-5 md:px-8 py-2.5 rounded-xl bg-yellow-600 text-black text-[10px] md:text-xs font-black uppercase shadow-xl shadow-yellow-900/20 hover:bg-yellow-500 transition-all active:scale-95"
               >
                 {user.role === 'ADMIN' ? 'Console' : 'Dashboard'}
               </button>
               
+              {/* Logout button - إخفاء على الموبايل */}
               <button 
                 onClick={onLogout}
-                className="text-gray-500 hover:text-white uppercase font-black text-[10px] md:text-xs tracking-[0.2em] transition-colors"
+                className="hidden md:block text-gray-500 hover:text-white uppercase font-black text-[10px] md:text-xs tracking-[0.2em] transition-colors"
               >
                 Logout
               </button>
@@ -266,7 +280,14 @@ const Home: React.FC<HomeProps> = ({ user, onLogout }) => {
       </footer>
 
       {/* --- Account Modal --- */}
-      <AccountModal isOpen={isAccountOpen} onClose={() => setIsAccountOpen(false)} user={user} />
+      <AccountModal 
+        isOpen={isAccountOpen} 
+        onClose={() => setIsAccountOpen(false)} 
+        user={user}
+        onLogout={onLogout}
+        onDeposit={handleDeposit}
+        onWithdraw={handleWithdraw}
+      />
     </div>
   );
 };

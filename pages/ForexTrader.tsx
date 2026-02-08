@@ -259,9 +259,9 @@ const ForexTrader: React.FC<ForexProps> = ({ user, onUpdateBalance, onSyncUserDa
                     min="0.01" 
                   />
                </div>
-               <div className="flex bg-[#1e2329] border border-[#2b2f36] rounded-xl h-10 md:h-12 overflow-hidden shadow-2xl">
-                  <button onClick={() => openOrder('SELL')} className="px-6 md:px-12 bg-red-600/20 text-red-500 border-r border-[#2b2f36] font-black text-[10px] md:text-[12px] uppercase hover:bg-red-600 hover:text-white transition-all tracking-widest active:scale-95">Sell</button>
-                  <button onClick={() => openOrder('BUY')} className="px-6 md:px-12 bg-blue-600/20 text-blue-500 font-black text-[10px] md:text-[12px] uppercase hover:bg-blue-600 hover:text-white transition-all tracking-widest active:scale-95">Buy</button>
+               <div className="flex bg-[#1e2329] border border-[#2b2f36] rounded-xl h-10 md:h-12 overflow-hidden shadow-2xl flex-1 md:flex-none">
+                  <button onClick={() => openOrder('SELL')} className="flex-1 md:flex-none px-3 md:px-12 bg-red-600/20 text-red-500 border-r border-[#2b2f36] font-black text-[9px] md:text-[12px] uppercase hover:bg-red-600 hover:text-white transition-all tracking-widest active:scale-95">Sell</button>
+                  <button onClick={() => openOrder('BUY')} className="flex-1 md:flex-none px-3 md:px-12 bg-blue-600/20 text-blue-500 font-black text-[9px] md:text-[12px] uppercase hover:bg-blue-600 hover:text-white transition-all tracking-widest active:scale-95">Buy</button>
                </div>
             </div>
           </div>

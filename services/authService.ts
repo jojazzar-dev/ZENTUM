@@ -174,6 +174,99 @@ export const AuthService = {
     return data ? JSON.parse(data) : null;
   },
 
+  // ===== دوال المزامنة المتقدمة (Advanced Cloud Sync) =====
+
+  // إضافة صفقة فوركس جديدة وحفظها فوراً في السحاب
+  addForexOrder: async (userId: string, order: any): Promise<void> => {
+    try {
+      const userRef = doc(db, "users", userId);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        const userData = userSnap.data() as User;
+        await updateDoc(userRef, {
+          forexOrders: [...(userData.forexOrders || []), order],
+          lastUpdated: new Date().toISOString()
+        });
+      }
+    } catch (error) {
+      console.error("Add forex order failed:", error);
+    }
+  },
+
+  // إغلاق صفقة فوركس وحفظها في السجل التاريخي
+  closeForexOrder: async (userId: string, orderId: string, historyEntry: any): Promise<void> => {
+    try {
+      const userRef = doc(db, "users", userId);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        const userData = userSnap.data() as User;
+        const updatedOrders = (userData.forexOrders || []).filter((o: any) => o.id !== orderId);
+        const updatedHistory = [...(userData.tradeHistory || []), historyEntry];
+        
+        await updateDoc(userRef, {
+          forexOrders: updatedOrders,
+          tradeHistory: updatedHistory,
+          lastUpdated: new Date().toISOString()
+        });
+      }
+    } catch (error) {
+      console.error("Close forex order failed:", error);
+    }
+  },
+
+  // إضافة أصل كريبتو جديد
+  addCryptoAsset: async (userId: string, asset: any): Promise<void> => {
+    try {
+      const userRef = doc(db, "users", userId);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        const userData = userSnap.data() as User;
+        await updateDoc(userRef, {
+          cryptoHoldings: [...(userData.cryptoHoldings || []), asset],
+          lastUpdated: new Date().toISOString()
+        });
+      }
+    } catch (error) {
+      console.error("Add crypto asset failed:", error);
+    }
+  },
+
+  // بيع أصل كريبتو
+  sellCryptoAsset: async (userId: string, assetId: string, historyEntry: any): Promise<void> => {
+    try {
+      const userRef = doc(db, "users", userId);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        const userData = userSnap.data() as User;
+        const updatedAssets = (userData.cryptoHoldings|| []).filter((a: any) => a.id !== assetId);
+        const updatedHistory = [...(userData.tradeHistory || []), historyEntry];
+        
+        await updateDoc(userRef, {
+          cryptoHoldings: updatedAssets,
+          tradeHistory: updatedHistory,
+          lastUpdated: new Date().toISOString()
+        });
+      }
+    } catch (error) {
+      console.error("Sell crypto asset failed:", error);
+    }
+  },
+
+  // تحديث الرصيد (Atomic Operation باستخدام increment)
+  updateBalance: async (userId: string, type: 'forex' | 'crypto', amount: number): Promise<void> => {
+    try {
+      const userRef = doc(db, "users", userId);
+      const balanceField = type === 'forex' ? 'forexBalance' : 'cryptoBalance';
+      
+      await updateDoc(userRef, {
+        [balanceField]: (await getDoc(userRef)).data()?.[balanceField] + amount || amount,
+        lastUpdated: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Update balance failed:", error);
+    }
+  },
+
   logout: async (): Promise<void> => {
     try { await signOut(auth); } catch (e) {}
     localStorage.removeItem(SESSION_KEY);
