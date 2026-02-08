@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthService } from '../services/authService';
 
 const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
   const navigate = useNavigate();
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  
   const [isRegister, setIsRegister] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -11,6 +13,15 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [passwordError, setPasswordError] = useState('');
+
+  // Focus on name input when register mode is activated
+  useEffect(() => {
+    if (isRegister && nameInputRef.current) {
+      setTimeout(() => {
+        nameInputRef.current?.focus();
+      }, 0);
+    }
+  }, [isRegister]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,6 +90,7 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
               className="w-full bg-black/30 border border-white/20 px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 text-base"
               disabled={loading}
               required
+              ref={nameInputRef}
             />
           )}
 
