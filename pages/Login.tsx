@@ -75,10 +75,10 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
             placeholder="Full Name" 
             value={name} 
             onChange={e => setName(e.target.value)} 
-            className={`w-full bg-black/30 border border-white/20 px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 text-base transition-opacity duration-200 ${
-              isRegister ? 'block opacity-100' : 'hidden opacity-0'
+            className={`w-full bg-black/30 border border-white/20 px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 text-base ${
+              isRegister ? 'block' : 'hidden'
             }`}
-            disabled={loading || !isRegister}
+            disabled={loading}
             style={{ display: isRegister ? 'block' : 'none' }}
           />
 
@@ -110,14 +110,14 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
             placeholder="Confirm Password" 
             value={confirmPassword} 
             onChange={e => setConfirmPassword(e.target.value)} 
-            className={`w-full bg-black/30 border px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none text-base transition-opacity duration-200 ${
-              isRegister ? 'block opacity-100' : 'hidden opacity-0'
+            className={`w-full bg-black/30 border px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none text-base ${
+              isRegister ? 'block' : 'hidden'
             } ${
               passwordError 
                 ? 'border-red-500 focus:border-red-500' 
                 : 'border-white/20 focus:border-yellow-400'
             }`}
-            disabled={loading || !isRegister}
+            disabled={loading}
             style={{ display: isRegister ? 'block' : 'none' }}
           />
 
