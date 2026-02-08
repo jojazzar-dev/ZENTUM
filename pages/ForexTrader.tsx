@@ -57,13 +57,35 @@ const ForexTrader: React.FC<ForexProps> = ({ user, onUpdateBalance, onSyncUserDa
     'NEARUSD', 'APTUSD', 'OPUSD', 'ARBUSD', 'SUIUSD', 'SEIUSD', 'PEPEUSD'
   ];
 
+  // --- [2] التحقق من ساعات السوق (Market Hours Check) ---
+  const isMarketOpen = () => {
+    const now = new Date();
+    const utcHours = now.getUTCHours();
+    const utcDay = now.getUTCDay(); // 0 = Sunday, 1 = Monday, ... 5 = Friday, 6 = Saturday
+    
+    // السوق مغلق السبت والأحد بالكامل
+    if (utcDay === 0 || utcDay === 6) return false;
+    
+    // السوق مفتوح الاثنين إلى الجمعة من 21:00 GMT (الأحد) إلى 21:00 GMT (الجمعة)
+    // إذا كان يوم الاثنين إلى الخميس، السوق مفتوح طول اليوم
+    if (utcDay >= 1 && utcDay <= 4) return true;
+    
+    // يوم الجمعة: مفتوح من 00:00 إلى 20:59 UTC فقط
+    if (utcDay === 5) return utcHours < 21;
+    
+    return false;
+  };
+
   // --- [2] محرك الأسعار اللحظية (Live Price Engine) ---
   function getLivePrice(sym: string) {
     if (!fxRates || Object.keys(fxRates).length === 0) return 1.00000;
     
+    // إذا كان السوق مغلق، لا نضيف تذبذب عشوائي - الأسعار ثابتة
+    const marketOpen = isMarketOpen();
+    
     // أسعار الذهب والعملات الرقمية داخل الفوركس (للعمليات الحسابية)
-    if (sym === 'XAUUSD') return 2035.50 + (Math.random() - 0.5);
-    if (sym === 'BTCUSD') return 96500.00 + (Math.random() * 10);
+    if (sym === 'XAUUSD') return marketOpen ? (2035.50 + (Math.random() - 0.5)) : 2035.50;
+    if (sym === 'BTCUSD') return marketOpen ? (96500.00 + (Math.random() * 10)) : 96500.00;
     
     const base = sym.substring(0,3);
     const target = sym.substring(3,6);
@@ -73,9 +95,13 @@ const ForexTrader: React.FC<ForexProps> = ({ user, onUpdateBalance, onSyncUserDa
     else if (target === 'USD') price = 1 / (fxRates[base] || 1);
     else price = (fxRates[target] || 1) / (fxRates[base] || 1);
     
-    // إضافة تذبذب طفيف جداً للمطابقة مع حركة الشارت السريعة
-    const flicker = (Math.random() - 0.5) * 0.0001;
-    return price + flicker; 
+    // إضافة تذبذب طفيف جداً فقط عندما يكون السوق مفتوح
+    if (marketOpen) {
+      const flicker = (Math.random() - 0.5) * 0.0001;
+      return price + flicker;
+    }
+    
+    return price; 
   }
 
   // --- [3] المحرك المالي الاحترافي (الرافعة المالية 5000 واللوت المتغير) ---
@@ -105,13 +131,26 @@ const ForexTrader: React.FC<ForexProps> = ({ user, onUpdateBalance, onSyncUserDa
       const r = await fetchFXPrices();
       if (r) setFxRates(r);
     };
+    
+    // جلب الأسعار فوراً عند الفتح
     syncData();
-    const interval = setInterval(syncData, 1000); 
-    return () => clearInterval(interval);
+    
+    // إذا كان السوق مفتوح، حدّث الأسعار كل ثانية
+    // إذا كان السوق مغلق، توقف التحديث لتجميد الأسعار والربح
+    if (isMarketOpen()) {
+      const interval = setInterval(syncData, 1000); 
+      return () => clearInterval(interval);
+    }
   }, []);
 
   // --- [5] وظائف إدارة الصفقات (Cloud Atomic Functions) ---
   const openOrder = async (type: 'BUY' | 'SELL') => {
+    // التحقق من ساعات السوق
+    if (!isMarketOpen()) {
+      alert("⛔ MARKET CLOSED: The forex market is currently closed. Trading is available Monday-Friday (UTC).");
+      return;
+    }
+
     const requiredMargin = volume * 20; 
 
     if (user.forexBalance <= 0) {
@@ -196,11 +235,13 @@ const ForexTrader: React.FC<ForexProps> = ({ user, onUpdateBalance, onSyncUserDa
 
         {/* جهة اليمين: المالية والتحكم */}
         <div className="flex gap-2 sm:gap-6 items-center">
+           {/* مؤشر حالة السوق */}
+           <div className={`px-3 py-1.5 rounded-lg border font-bold uppercase flex items-center gap-2 text-[8px] sm:text-[10px] tracking-widest ${isMarketOpen() ? 'bg-green-600/20 border-green-500/30 text-green-400' : 'bg-red-600/20 border-red-500/30 text-red-400'}`}>
+             <span className={`w-2 h-2 rounded-full ${isMarketOpen() ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></span>
+             {isMarketOpen() ? 'MARKET OPEN' : 'MARKET CLOSED'}
+           </div>
+           
            <div className="bg-black/40 px-3 py-1.5 rounded-2xl border border-white/5 font-bold uppercase flex items-center gap-2 sm:gap-4 shadow-inner">
-              <div className="flex flex-col items-end border-r border-white/10 pr-2 sm:pr-6">
-                <span className="text-gray-600 text-[8px] tracking-widest font-black uppercase">Equity</span>
-                <span className={`font-mono text-[11px] sm:text-[14px] font-black ${totalPL >= 0 ? 'text-green-500' : 'text-red-500'}`}>${equity.toFixed(2)}</span>
-              </div>
               <div className="flex flex-col items-end">
                 <span className="text-gray-600 text-[8px] tracking-widest font-black uppercase">Balance</span>
                 <span className="text-white font-mono text-[11px] sm:text-[14px] font-black">${user.forexBalance.toFixed(2)}</span>
