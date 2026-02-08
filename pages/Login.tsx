@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthService } from '../services/authService';
 
 const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
   const navigate = useNavigate();
+  const nameInputRef = useRef<HTMLInputElement>(null);
   const [isRegister, setIsRegister] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -79,7 +80,7 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
               className="w-full bg-black/30 border border-white/20 px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 text-base"
               disabled={loading}
               required
-              autoFocus={isRegister}
+              ref={nameInputRef}
             />
           )}
 
@@ -157,6 +158,12 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
               setIsRegister(!isRegister);
               setPasswordError('');
               setConfirmPassword('');
+              // Focus on name input when switching to register
+              if (!isRegister) {
+                setTimeout(() => {
+                  nameInputRef.current?.focus();
+                }, 50);
+              }
             }}
             disabled={loading}
             className="text-yellow-500 ml-2 font-black hover:underline transition-all disabled:opacity-50"
