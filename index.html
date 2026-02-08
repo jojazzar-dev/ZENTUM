@@ -10,10 +10,22 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ZENTUM">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="ZENTUM">
+    
+    <!-- iOS Splash Screens -->
+    <meta name="apple-touch-fullscreen" content="yes">
+    <link rel="apple-touch-startup-image" href="/logo.svg">
+    
+    <!-- Icons -->
     <link rel="apple-touch-icon" href="/logo.svg">
     <link rel="icon" type="image/svg+xml" href="/logo.svg">
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#181a20">
+    
+    <!-- Theme Colors -->
+    <meta name="theme-color" content="#0b0e11">
+    <meta name="msapplication-TileColor" content="#0b0e11">
+    <meta name="msapplication-navbutton-color" content="#0b0e11">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
@@ -166,7 +178,10 @@
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/sw.js')
-            .then(reg => console.log('✅ Service Worker registered:', reg.scope))
+            .then(reg => {
+              console.log('✅ Service Worker registered:', reg.scope);
+              console.log('📱 PWA ready to install!');
+            })
             .catch(err => console.log('❌ Service Worker registration failed:', err));
         });
       }
@@ -178,25 +193,35 @@
       const closeBtn = document.getElementById('pwa-close-btn');
 
       window.addEventListener('beforeinstallprompt', (e) => {
+        console.log('🎯 PWA install prompt triggered');
         e.preventDefault();
         deferredPrompt = e;
         
-        // Show banner after 2 seconds if not dismissed before
+        // Show banner after 3 seconds if not dismissed before
         setTimeout(() => {
           const dismissed = localStorage.getItem('pwa-install-dismissed');
-          if (!dismissed) {
+          const installed = localStorage.getItem('pwa-installed');
+          
+          if (!dismissed && !installed) {
+            console.log('👋 Showing install banner');
             installBanner.style.display = 'flex';
           }
-        }, 2000);
+        }, 3000);
       });
 
       installBtn.addEventListener('click', async () => {
         if (deferredPrompt) {
+          console.log('🚀 Prompting install...');
           deferredPrompt.prompt();
           const { outcome } = await deferredPrompt.userChoice;
           
+          console.log('User choice:', outcome);
+          
           if (outcome === 'accepted') {
             console.log('✅ User accepted PWA install');
+            localStorage.setItem('pwa-installed', 'true');
+          } else {
+            console.log('❌ User dismissed PWA install');
           }
           
           deferredPrompt = null;
@@ -205,27 +230,58 @@
       });
 
       closeBtn.addEventListener('click', () => {
+        console.log('🙅 User closed install banner');
         installBanner.style.display = 'none';
         localStorage.setItem('pwa-install-dismissed', 'true');
       });
 
+      // Check if already installed
+      window.addEventListener('appinstalled', () => {
+        console.log('🎉 ZENTUM app installed successfully!');
+        localStorage.setItem('pwa-installed', 'true');
+        installBanner.style.display = 'none';
+        
+        // Show success message
+        alert('✅ ZENTUM app installed successfully! You can now access it from your home screen.');
+      });
+
       // iOS Installation Instructions
-      const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
-      if (isIOS && !navigator.standalone) {
+      const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream;
+      const isInStandaloneMode = ('standalone' in window.navigator) && window.navigator.standalone;
+
+      if (isIOS && !isInStandaloneMode) {
+        console.log('📱 iOS detected - showing install instructions');
         setTimeout(() => {
           const dismissed = localStorage.getItem('pwa-install-dismissed');
-          if (!dismissed) {
-            installBanner.querySelector('div > div:last-child').textContent = 
-              'Tap Share → Add to Home Screen';
+          const installed = localStorage.getItem('pwa-installed');
+          
+          if (!dismissed && !installed) {
+            const textDiv = installBanner.querySelector('div > div:last-child');
+            if (textDiv) {
+              textDiv.innerHTML = '<div style="font-size: 10px; line-height: 1.4;">Tap <strong>Share</strong> button (⬆️) <br>then <strong>Add to Home Screen</strong></div>';
+            }
             installBanner.style.display = 'flex';
-            installBtn.textContent = 'Got it';
+            installBtn.textContent = 'Got it ✓';
             installBtn.onclick = () => {
               installBanner.style.display = 'none';
               localStorage.setItem('pwa-install-dismissed', 'true');
             };
           }
-        }, 2000);
+        }, 3000);
       }
+
+      // Detect if running as installed app
+      if (isInStandaloneMode || window.matchMedia('(display-mode: standalone)').matches) {
+        console.log('🎊 Running as installed PWA!');
+        localStorage.setItem('pwa-installed', 'true');
+      }
+
+      // Debug info
+      console.log('📊 PWA Status:');
+      console.log('- Service Worker Support:', 'serviceWorker' in navigator);
+      console.log('- Is iOS:', isIOS);
+      console.log('- Is Standalone:', isInStandaloneMode || window.matchMedia('(display-mode: standalone)').matches);
+      console.log('- User Agent:', navigator.userAgent);
     </script>
 
     <script type="module" src="/index.tsx"></script>
