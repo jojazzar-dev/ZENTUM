@@ -285,8 +285,8 @@ const Home: React.FC<HomeProps> = ({ user, onLogout }) => {
         onClose={() => setIsAccountOpen(false)} 
         user={user}
         onLogout={onLogout}
-        onDeposit={handleDeposit}
-        onWithdraw={handleWithdraw}
+        onOpenDeposit={() => handleDeposit('forex')}
+        onOpenWithdraw={() => handleWithdraw('forex')}
       />
     </div>
   );

@@ -21,12 +21,17 @@ textarea,
 select {
   max-width: 100%;
   font-size: 16px; /* Prevents zoom on iOS */
+  pointer-events: auto !important;
 }
 
 /* Ensure buttons are touchable on mobile */
 button {
   min-height: 44px;
   min-width: 44px;
+  pointer-events: auto !important;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 /* Mobile responsive helpers */
@@ -44,5 +49,11 @@ button {
   h1, h2, h3, h4, h5, h6 {
     word-wrap: break-word;
     overflow-wrap: break-word;
+  }
+  
+  /* Improve touch targets on mobile */
+  button, input, textarea, select {
+    min-height: 44px;
+    min-width: 44px;
   }
 }

@@ -7,8 +7,8 @@ interface AccountModalProps {
   onClose: () => void;
   user: User | null;
   onLogout?: () => void;
-  onDeposit?: (type: 'forex' | 'crypto') => void;
-  onWithdraw?: (type: 'forex' | 'crypto') => void;
+  onOpenDeposit?: () => void;
+  onOpenWithdraw?: () => void;
 }
 
 const AccountModal: React.FC<AccountModalProps> = ({ 
@@ -16,8 +16,8 @@ const AccountModal: React.FC<AccountModalProps> = ({
   onClose, 
   user,
   onLogout,
-  onDeposit,
-  onWithdraw
+  onOpenDeposit,
+  onOpenWithdraw
 }) => {
   if (!isOpen || !user) return null;
 
@@ -143,7 +143,10 @@ const AccountModal: React.FC<AccountModalProps> = ({
             {/* Deposit Buttons */}
             <div className="grid grid-cols-2 gap-3">
               <button 
-                onClick={() => onDeposit && onDeposit('forex')}
+                onClick={() => {
+                  onOpenDeposit && onOpenDeposit();
+                  onClose();
+                }}
                 className="bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 text-blue-400 font-black py-3 px-4 rounded-xl transition-all uppercase text-xs tracking-wider flex items-center justify-center gap-2"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3">
@@ -152,7 +155,10 @@ const AccountModal: React.FC<AccountModalProps> = ({
                 Deposit Forex
               </button>
               <button 
-                onClick={() => onDeposit && onDeposit('crypto')}
+                onClick={() => {
+                  onOpenDeposit && onOpenDeposit();
+                  onClose();
+                }}
                 className="bg-yellow-600/20 hover:bg-yellow-600/30 border border-yellow-500/30 text-yellow-400 font-black py-3 px-4 rounded-xl transition-all uppercase text-xs tracking-wider flex items-center justify-center gap-2"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3">
@@ -165,7 +171,10 @@ const AccountModal: React.FC<AccountModalProps> = ({
             {/* Withdraw Buttons */}
             <div className="grid grid-cols-2 gap-3">
               <button 
-                onClick={() => onWithdraw && onWithdraw('forex')}
+                onClick={() => {
+                  onOpenWithdraw && onOpenWithdraw();
+                  onClose();
+                }}
                 className="bg-blue-600/10 hover:bg-blue-600/20 border border-blue-500/20 text-blue-400 font-black py-3 px-4 rounded-xl transition-all uppercase text-xs tracking-wider flex items-center justify-center gap-2"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3">
@@ -174,7 +183,10 @@ const AccountModal: React.FC<AccountModalProps> = ({
                 Withdraw Forex
               </button>
               <button 
-                onClick={() => onWithdraw && onWithdraw('crypto')}
+                onClick={() => {
+                  onOpenWithdraw && onOpenWithdraw();
+                  onClose();
+                }}
                 className="bg-yellow-600/10 hover:bg-yellow-600/20 border border-yellow-500/20 text-yellow-400 font-black py-3 px-4 rounded-xl transition-all uppercase text-xs tracking-wider flex items-center justify-center gap-2"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3">

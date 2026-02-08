@@ -209,27 +209,38 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
         <div className="flex-1 flex flex-col overflow-hidden min-w-0 bg-[#0b0e11]">
           
           {/* Quick Trade Interface */}
-          <div className="p-3 md:p-4 bg-[#181A20] border-b border-white/5 flex justify-between items-center gap-2 md:gap-4 shadow-md shrink-0">
-            <div className="flex flex-col">
-              <h2 className="text-lg md:text-2xl font-black uppercase tracking-tighter text-white italic leading-none">{selected} <span className="text-gray-500 not-italic">/ USDT</span></h2>
+          <div className="p-3 md:p-4 bg-[#181A20] border-b border-white/5 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 sm:gap-4 shadow-md shrink-0 relative z-20">
+            <div className="flex flex-col min-w-0">
+              <h2 className="text-lg md:text-2xl font-black uppercase tracking-tighter text-white italic leading-none truncate">{selected} <span className="text-gray-500 not-italic">/ USDT</span></h2>
               <span className="text-[7px] md:text-[9px] text-yellow-500 font-black tracking-widest uppercase mt-1 italic">Real-time Node Execution</span>
             </div>
 
-            <div className="flex items-center gap-2 md:gap-4">
-               <div className="flex items-center bg-black/60 rounded-2xl border border-white/10 h-10 md:h-12 px-3 md:px-5 shadow-inner">
-                  <span className="text-[8px] md:text-[10px] text-gray-500 font-black mr-2 md:mr-4 uppercase tracking-widest">QUANTITY</span>
+            <div className="flex items-center gap-2 md:gap-4 w-full sm:w-auto">
+               <div className="flex items-center bg-black/60 rounded-lg border border-white/10 h-12 md:h-14 px-3 md:px-5 shadow-inner flex-1 sm:flex-none">
+                  <span className="text-[8px] md:text-[10px] text-gray-500 font-black mr-2 md:mr-4 uppercase tracking-widest whitespace-nowrap">QTY</span>
                   <input 
                     type="number" 
                     value={volume} 
                     onChange={e => setVolume(parseFloat(e.target.value))} 
-                    className="w-12 md:w-28 bg-transparent border-none text-white text-[12px] md:text-[15px] font-black outline-none font-mono text-center" 
+                    className="flex-1 md:w-28 bg-transparent border-none text-white text-[14px] md:text-[16px] font-black outline-none font-mono text-center pointer-events-auto" 
                     step="0.01" 
-                    min="0.01" 
+                    min="0.01"
+                    inputMode="decimal"
                   />
                </div>
-               <div className="flex bg-[#1e2329] border border-white/10 rounded-2xl h-10 md:h-12 overflow-hidden shadow-2xl flex-1 md:flex-none">
-                  <button onClick={() => handleTrade('SELL')} className="flex-1 md:flex-none px-3 md:px-16 bg-red-600/20 text-red-500 border-r border-white/5 font-black uppercase text-[9px] md:text-[13px] hover:bg-red-600 hover:text-white transition-all tracking-widest active:scale-95">Sell</button>
-                  <button onClick={() => handleTrade('BUY')} className="flex-1 md:flex-none px-3 md:px-16 bg-[#02c076]/20 text-[#02c076] font-black uppercase text-[9px] md:text-[13px] hover:bg-[#02c076] hover:text-white transition-all tracking-widest active:scale-95">Buy</button>
+               <div className="flex bg-[#1e2329] border border-white/10 rounded-lg h-12 md:h-14 overflow-hidden shadow-2xl flex-1 md:flex-none">
+                  <button 
+                    onClick={() => handleTrade('SELL')} 
+                    className="flex-1 md:flex-none px-4 md:px-16 py-3 md:py-4 bg-red-600/20 text-red-500 border-r border-white/5 font-black uppercase text-[11px] md:text-[13px] hover:bg-red-600 hover:text-white transition-all tracking-widest active:scale-95 cursor-pointer pointer-events-auto"
+                  >
+                    Sell
+                  </button>
+                  <button 
+                    onClick={() => handleTrade('BUY')} 
+                    className="flex-1 md:flex-none px-4 md:px-16 py-3 md:py-4 bg-[#02c076]/20 text-[#02c076] font-black uppercase text-[11px] md:text-[13px] hover:bg-[#02c076] hover:text-white transition-all tracking-widest active:scale-95 cursor-pointer pointer-events-auto"
+                  >
+                    Buy
+                  </button>
                </div>
             </div>
           </div>
@@ -310,7 +321,20 @@ const CryptoExchange: React.FC<CryptoProps> = ({ user, onUpdateBalance, onSyncUs
 
       {/* --- [D] POPUPS & MODALS --- */}
       <DepositModal isOpen={isDepositOpen} onClose={() => setIsDepositOpen(false)} user={user} />
-      <AccountModal isOpen={isAccountOpen} onClose={() => setIsAccountOpen(false)} user={user} />
+      <AccountModal 
+        isOpen={isAccountOpen} 
+        onClose={() => setIsAccountOpen(false)} 
+        user={user}
+        onOpenDeposit={() => {
+          setIsDepositOpen(true);
+          setIsAccountOpen(false);
+        }}
+        onOpenWithdraw={() => {
+          setIsWithdrawOpen(true);
+          setIsAccountOpen(false);
+        }}
+        onLogout={onLogout}
+      />
       <WithdrawModal isOpen={isWithdrawOpen} onClose={() => setIsWithdrawOpen(false)} user={user} walletType="crypto" />
     </div>
   );
