@@ -75,37 +75,61 @@ const Home: React.FC<HomeProps> = ({ user, onLogout }) => {
       {/* --- [A] NAVBAR: CLEAN & MINIMAL --- */}
       <nav className="p-3 md:p-4 flex justify-between items-center border-b border-white/5 bg-[#181a20]/80 backdrop-blur-2xl sticky top-0 z-[100] shadow-lg shrink-0">
         
-        {/* جهة اليسار: Logo مع ZENTUM */}
-        <div className="flex items-center gap-3">
+        {/* جهة اليسار: Logo + ZENTUM + Home + Account */}
+        <div className="flex items-center gap-3 md:gap-8">
           <div className="flex items-center gap-2 md:gap-3 cursor-pointer group" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>
             <Logo className="w-7 h-7 md:w-10 md:h-10 group-hover:rotate-12 transition-transform" />
             <span className="font-black text-yellow-500 uppercase text-lg md:text-2xl tracking-tighter italic">ZENTUM</span>
           </div>
-        </div>
 
-        {/* جهة الوسط: Home + Account */}
-        {user && (
-          <div className="flex items-center gap-6">
-            <button 
-              onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}
-              className="text-gray-400 hover:text-white transition-all uppercase font-black text-[11px] md:text-[12px] tracking-widest flex items-center gap-1.5"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
-                <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              Home
-            </button>
-            <button 
-              onClick={() => setIsAccountOpen(true)}
-              className="text-gray-400 hover:text-white transition-all uppercase font-black text-[11px] md:text-[12px] tracking-widest flex items-center gap-1.5"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
-                <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              Account
-            </button>
-          </div>
-        )}
+          {/* Home + Account - Mobile Hidden, Desktop Visible */}
+          {user && (
+            <div className="hidden md:flex items-center gap-6">
+              <button 
+                onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}
+                className="text-gray-400 hover:text-white transition-all uppercase font-black text-base tracking-widest flex items-center gap-2"
+              >
+                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                  <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                Home
+              </button>
+              <button 
+                onClick={() => setIsAccountOpen(true)}
+                className="text-gray-400 hover:text-white transition-all uppercase font-black text-base tracking-widest flex items-center gap-2"
+              >
+                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                  <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                Account
+              </button>
+            </div>
+          )}
+
+          {/* Mobile: Home + Account */}
+          {user && (
+            <div className="flex md:hidden items-center gap-4">
+              <button 
+                onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}
+                className="text-gray-400 hover:text-white transition-all uppercase font-black text-[10px] tracking-widest flex items-center gap-1"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                  <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                Home
+              </button>
+              <button 
+                onClick={() => setIsAccountOpen(true)}
+                className="text-gray-400 hover:text-white transition-all uppercase font-black text-[10px] tracking-widest flex items-center gap-1"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                  <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                Account
+              </button>
+            </div>
+          )}
+        </div>
         
         {/* جهة اليمين: Login أو Logout */}
         <div className="flex gap-3 md:gap-4 items-center">
