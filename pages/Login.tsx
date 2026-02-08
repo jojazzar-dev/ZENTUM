@@ -69,6 +69,19 @@ const Login: React.FC<{ onLogin: any }> = ({ onLogin }) => {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Name Field - Register Only */}
+          {isRegister && (
+            <input 
+              type="text" 
+              placeholder="Full Name" 
+              value={name} 
+              onChange={e => setName(e.target.value)} 
+              className="w-full bg-black/30 border border-white/20 px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 text-base"
+              disabled={loading}
+              required
+            />
+          )}
+
           {/* Email Field */}
           <input 
             type="email" 
