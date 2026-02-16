@@ -56,6 +56,7 @@ const AccountModal: React.FC<AccountModalProps> = ({
               {user.name[0].toUpperCase()}
             </div>
             <h2 className="text-xl font-bold text-white uppercase tracking-tight">{user.name}</h2>
+            <span className="text-[9px] text-yellow-500 font-black uppercase tracking-widest mt-2">🟢 Real Account</span>
             <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">ZENTUM Verified Trader</span>
           </div>
 
@@ -63,13 +64,13 @@ const AccountModal: React.FC<AccountModalProps> = ({
           <div className="space-y-4">
             <div className="bg-black/30 p-4 rounded-2xl border border-white/5">
               <label className="text-[9px] text-gray-600 font-black uppercase tracking-widest block mb-1">Email Address</label>
-              <span className="text-white font-medium text-sm">{user.email}</span>
+              <span className="text-white font-medium text-xs">{user.email}</span>
             </div>
 
             <div className="bg-black/30 p-4 rounded-2xl border border-white/5 flex justify-between items-center group">
               <div className="flex-1">
                 <label className="text-[9px] text-gray-600 font-black uppercase tracking-widest block mb-1">Account UID</label>
-                <span className="text-yellow-500 font-mono text-xs">{user.id}</span>
+                <span className="text-yellow-500 font-mono text-[11px]">{user.id}</span>
               </div>
               <button 
                 onClick={copyUID}

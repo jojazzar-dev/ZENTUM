@@ -108,13 +108,31 @@ const ForexTrader: React.FC<ForexProps> = ({ user, onUpdateBalance, onSyncUserDa
   const calculatePL = (o: any) => {
     const currentP = getLivePrice(o.symbol);
     const diff = o.type === 'BUY' ? (currentP - o.openPrice) : (o.openPrice - currentP);
-    
-    // قيمة العقد القياسي 100,000 للعملات و 1,000 للذهب والين
-    const isSmallContract = o.symbol.includes('JPY') || o.symbol.includes('XAU') || (o.symbol.includes('USD') && o.symbol.length > 6);
-    const contractSize = isSmallContract ? 1000 : 100000;
-    
-    // الربح = (فرق السعر) * (الفوليوم المختار عند الفتح) * (حجم العقد)
-    return diff * o.volume * contractSize;
+
+    const base = o.symbol.substring(0, 3);
+    const quote = o.symbol.substring(3, 6);
+    const isGold = o.symbol === 'XAUUSD';
+    const isCrypto = o.symbol.length > 6 && quote === 'USD';
+
+    // العقد القياسي للفوركس = 100,000 وحدة من العملة الأساسية
+    // الذهب = 100 أونصة للعقد القياسي
+    // الكريبتو داخل الفوركس نفترض 1 وحدة/عقد (يمكن تعديلها لاحقاً حسب المنتج)
+    const contractSize = isGold ? 100 : isCrypto ? 1 : 100000;
+
+    // الربح الأولي يكون بعملة الـ Quote
+    const plInQuote = diff * o.volume * contractSize;
+
+    // تحويل الربح إلى USD إذا كانت عملة الـ Quote ليست USD
+    if (quote === 'USD') {
+      return plInQuote;
+    }
+
+    const quoteRate = fxRates?.[quote] || 0;
+    if (quoteRate === 0) {
+      return 0;
+    }
+
+    return plInQuote / quoteRate;
   };
 
   const totalPL = orders.reduce((sum, o) => sum + calculatePL(o), 0);
