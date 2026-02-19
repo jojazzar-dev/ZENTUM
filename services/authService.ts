@@ -38,55 +38,28 @@ export const AuthService = {
 
   // محرك تسجيل الدخول (يدعم الإدمن والمستخدمين مع جلب البيانات اللحظية)
   login: async (email: string, password: string): Promise<{success: boolean, user?: User, message?: string}> => {
-    const cleanEmail = email.trim().toUpperCase();
-    const cleanPassword = password.trim();
-
     try {
-      // 1. منطق الإدمن الخارق (ZENTUM MASTER ADMIN)
-      if (cleanEmail === 'ZENTUM.WORLD@GMAIL.COM' && cleanPassword === 'zentum13579@Z') {
-        const adminId = 'zentum-master-root';
-        const adminDoc = await getDoc(doc(db, "users", adminId));
-        
-        let adminData: User;
-        if (adminDoc.exists()) {
-          adminData = adminDoc.data() as User;
-        } else {
-          adminData = {
-            id: adminId,
-            email: 'ZENTUM.WORLD@GMAIL.COM',
-            name: 'ZENTUM MASTER',
-            forexBalance: 1000, 
-            cryptoBalance: 1000,
-            role: 'ADMIN',
-            emailVerified: true,
-            createdAt: Date.now(),
-            forexOrders: [],
-            cryptoHoldings: [],
-            tradeHistory: []
-          };
-          await setDoc(doc(db, "users", adminId), adminData);
-        }
-        localStorage.setItem(SESSION_KEY, JSON.stringify(adminData));
-        return { success: true, user: adminData };
-      }
-
-      // 2. تسجيل دخول المستخدمين العاديين
+      // تسجيل دخول عبر Firebase Auth
       const userCredential = await signInWithEmailAndPassword(auth, email.trim(), password);
       const firebaseUser = userCredential.user;
 
-      // التأكد من تفعيل الإيميل
-      if (!firebaseUser.emailVerified) {
+      // جلب بيانات المستخدم من Firestore
+      const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
+      if (!userDoc.exists()) {
+        await signOut(auth);
+        return { success: false, message: "User profile record not found." };
+      }
+
+      const userData = userDoc.data() as User;
+
+      // التأكد من تفعيل الإيميل للمستخدمين العاديين فقط (الإدمن معفى)
+      if (!firebaseUser.emailVerified && userData.role !== 'ADMIN') {
         await signOut(auth);
         return { success: false, message: "Please verify your email. Check your inbox for the activation link." };
       }
 
-      const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
-      if (userDoc.exists()) {
-        const userData = userDoc.data() as User;
-        localStorage.setItem(SESSION_KEY, JSON.stringify(userData));
-        return { success: true, user: userData };
-      }
-      return { success: false, message: "User profile record not found." };
+      localStorage.setItem(SESSION_KEY, JSON.stringify(userData));
+      return { success: true, user: userData };
 
     } catch (error: any) {
       console.error("Login Error:", error.code);
