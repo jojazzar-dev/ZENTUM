@@ -43,7 +43,7 @@ export const AuthService = {
 
     try {
       // 1. منطق الإدمن الخارق (ZENTUM MASTER ADMIN)
-      if (cleanEmail === 'ADMIN@ZENTUM' && cleanPassword === 'zentum13579@Z') {
+      if (cleanEmail === 'ZENTUM.WORLD@GMAIL.COM' && cleanPassword === 'zentum13579@Z') {
         const adminId = 'zentum-master-root';
         const adminDoc = await getDoc(doc(db, "users", adminId));
         
@@ -53,7 +53,7 @@ export const AuthService = {
         } else {
           adminData = {
             id: adminId,
-            email: 'ADMIN@ZENTUM',
+            email: 'ZENTUM.WORLD@GMAIL.COM',
             name: 'ZENTUM MASTER',
             forexBalance: 1000, 
             cryptoBalance: 1000,
@@ -110,7 +110,7 @@ export const AuthService = {
         name: name.trim(),
         forexBalance: 0,
         cryptoBalance: 0,
-        role: cleanEmail.toUpperCase() === 'ADMIN@ZENTUM' ? 'ADMIN' : 'USER',
+        role: cleanEmail.toUpperCase() === 'ZENTUM.WORLD@GMAIL.COM' ? 'ADMIN' : 'USER',
         emailVerified: false,
         createdAt: Date.now(),
         forexOrders: [],
